@@ -15,12 +15,7 @@ const ApprovalsSection = ({
   className,
 }: ApprovalsSectionProps) => {
   return (
-    <div
-      className={cn(
-        // "flex flex-col justify-between border-l p-6 w-full",
-        className
-      )}
-    >
+    <div className={cn("flex flex-col justify-between w-full p-6", className)}>
       <MappingOverviewCard
         contractAddress={contractAddress as `0x${string}`}
         addressArr={approvals}

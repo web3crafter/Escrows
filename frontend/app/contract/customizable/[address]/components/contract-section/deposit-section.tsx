@@ -14,7 +14,7 @@ const DepositSection = ({
   className,
 }: DepositSectionProps) => {
   return (
-    <div className={cn(className)}>
+    <div className={cn("flex flex-col justify-between w-full p-6", className)}>
       <MappingOverviewCard
         contractAddress={contractAddress as `0x${string}`}
         addressArr={deposits}

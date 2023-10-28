@@ -64,7 +64,6 @@ export const getStandardContractInfo = async (
 export const getCustomizableContractInfo = async (
   customizableContractAddress: string
 ) => {
-  //TODO: Error handling
   const contractAddress = customizableContractAddress as `0x${string}`
   const contractInfo = await publicClient.readContract({
     address: contractAddress,

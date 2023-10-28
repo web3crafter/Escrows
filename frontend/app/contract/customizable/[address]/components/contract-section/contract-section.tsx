@@ -3,9 +3,9 @@
 import ArbitersComponent from "@/app/contract/customizable/[address]/components/contract-section/arbiters-component"
 import BeneficiaryComponent from "@/app/contract/customizable/[address]/components/contract-section/beneficiary-component"
 import ManagersComponent from "@/app/contract/customizable/[address]/components/contract-section/managers-component"
-import ContractBalance from "@/components/card-rows/contract-balance"
-import ContractOwner from "@/components/card-rows/contract-owner"
-import RequestedAmount from "@/components/card-rows/customizable/requested-amount"
+import ContractBalanceRow from "@/components/card-rows/contract-balance-row"
+import RequestedAmountRow from "@/components/card-rows/customizable/requested-amount-row"
+import OwnerRow from "@/components/card-rows/owner-row"
 import RequestETHAmount from "@/components/customizable/request"
 import { cn } from "@/lib/utils"
 
@@ -26,17 +26,17 @@ const ContractSection = ({
   className,
 }: ContractSectionProps) => {
   return (
-    <div className={cn(className)}>
+    <div className={cn("flex flex-col px-4 py-6 md:px-8 gap-8", className)}>
       <BeneficiaryComponent
         contractAddress={contractAddress}
         beneficiaryAddress={beneficiary}
       />
 
-      <ContractBalance contractAddress={contractAddress} />
+      <ContractBalanceRow contractAddress={contractAddress} />
 
-      <ContractOwner owner={deployer} />
+      <OwnerRow owner={deployer} />
 
-      <RequestedAmount contractAddress={contractAddress} />
+      <RequestedAmountRow contractAddress={contractAddress} />
 
       <div className="flex flex-col gap-8">
         <ManagersComponent

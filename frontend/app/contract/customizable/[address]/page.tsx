@@ -5,6 +5,7 @@ import ApprovalsSection from "@/app/contract/customizable/[address]/components/a
 
 import ContractSection from "@/app/contract/customizable/[address]/components/contract-section/contract-section"
 import DepositSection from "@/app/contract/customizable/[address]/components/contract-section/deposit-section"
+import { Card } from "@/components/ui/card"
 
 const CustomizableContractPage = async ({
   params,
@@ -36,7 +37,7 @@ const CustomizableContractPage = async ({
         <DepositSection
           contractAddress={contractAddress as `0x${string}`}
           deposits={deposits}
-          className="flex flex-col justify-between w-full col-span-2 col-start-1 row-start-2 p-6 md:col-span-1 xl:col-span-1 xl:border-r xl:row-start-1"
+          className="col-span-2 col-start-1 row-start-2  md:col-span-1 xl:col-span-1 xl:border xl:rounded-l-lg xl:row-start-1 xl:bg-secondary"
         />
 
         <ContractSection
@@ -45,14 +46,14 @@ const CustomizableContractPage = async ({
           beneficiary={beneficiary}
           arbiters={arbiters}
           managers={managers}
-          className="flex flex-col col-span-2 row-start-1 gap-8 px-4 py-6 md:px-8 xl:col-span-2 xl:col-start-2 "
+          className="col-span-2 row-start-1 xl:col-span-2 xl:col-start-2 xl:border-t xl:border-b "
         />
 
         <ApprovalsSection
           contractAddress={contractAddress as `0x${string}`}
           beneficiary={beneficiary}
           approvals={approvals}
-          className="flex flex-col justify-between w-full col-span-2 row-start-3 p-6 md:col-span-1 md:row-start-2 xl:col-start-4 xl:border-l xl:row-start-1"
+          className="col-span-2 row-start-3 md:col-span-1 md:row-start-2 xl:col-start-4 xl:border xl:rounded-r-lg xl:row-start-1 xl:bg-secondary"
         />
       </div>
     </main>

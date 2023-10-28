@@ -1,8 +1,6 @@
-import { CallToActionButton } from "@/components/call-to-action-button"
 import ContractTypeInfo from "@/components/contract-type-info"
 import { Separator } from "@/components/ui/separator"
 
-// Define the two types of escrow contracts
 const escrowTypes = {
   standard: {
     title: "Standard contract",
@@ -28,7 +26,7 @@ const escrowTypes = {
 }
 
 /**
- * EscrowTypeSection component displays information about two types of escrow contracts.
+ * A React component representing a section for displaying two types of escrow contracts.
  */
 export const EscrowTypeSection = () => {
   return (

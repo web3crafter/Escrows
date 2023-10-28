@@ -2,7 +2,7 @@ import CardRow from "@/components/card-row"
 import { HoverCopy } from "@/components/hover-copy"
 import { formatAddress } from "@/lib/utils"
 
-const ContractArbiter = ({ arbiter }: { arbiter: string }) => {
+const ArbiterRow = ({ arbiter }: { arbiter: string }) => {
   return (
     <CardRow
       label="Contract Arbiter"
@@ -12,4 +12,4 @@ const ContractArbiter = ({ arbiter }: { arbiter: string }) => {
     />
   )
 }
-export default ContractArbiter
+export default ArbiterRow

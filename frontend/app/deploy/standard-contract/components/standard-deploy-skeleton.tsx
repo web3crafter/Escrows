@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export const SimpleContractSkeleton = () => {
+const StandardDeploySkeleton = () => {
   return (
     <div className="px-2 py-10 space-y-4 sm:w-96 h-[420px] rounded-lg shadow-sm bg-secondary">
       <Skeleton className="w-40 h-6 bg-muted-foreground" />
@@ -24,3 +24,5 @@ export const SimpleContractSkeleton = () => {
     </div>
   )
 }
+
+export default StandardDeploySkeleton

@@ -31,7 +31,7 @@ const ContractsRenderer = ({ contracts }: ContractsRendererProps) => {
   const validatedICustomizableEscrow = ICustomizableArray.safeParse(contracts)
 
   return (
-    <div className="flex flex-col items-center space-y-4 xl:space-y-0 xl:grid-cols-2 xl:grid xl:gap-x-4">
+    <div className="flex flex-col items-center space-y-4 xl:space-y-0 xl:grid-cols-2 xl:grid xl:gap-4">
       {validatedIEscrow.success &&
         validatedIEscrow.data.length > 0 &&
         validatedIEscrow.data.map((individualContract) => (
@@ -48,7 +48,7 @@ const ContractsRenderer = ({ contracts }: ContractsRendererProps) => {
           <CustomizableContractCard
             key={individualContract.contractAddress}
             contract={individualContract}
-            className="w-full max-w-2xl px-2 sm:px-8"
+            className="w-full max-w-2xl px-2 sm:px-8 h-full"
           />
         ))}
     </div>

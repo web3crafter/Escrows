@@ -68,9 +68,6 @@ const escrowTypes = {
   },
 }
 
-/**
- * CreateContractPage component displays a page where users can choose between two types of escrow contracts.
- */
 const CreateContractPage = () => {
   return (
     <main className="container flex flex-col items-center w-full gap-16 text-center">

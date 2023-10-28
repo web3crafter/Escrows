@@ -1,10 +1,13 @@
+"use client"
+
 import { SpinnerButton } from "@/components/spinner-button"
 import { standardContractAbi } from "@/constants/abi/abis"
 import { useReleasedAmount } from "@/hooks/useReleasedAmount"
 import { useStandardAccountRoles } from "@/hooks/useStandardAccountRoles"
+import { useValidatedForms } from "@/hooks/useValidatedForms"
 import { toast } from "sonner"
 import { formatEther } from "viem"
-import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi"
+import { useContractWrite, useWaitForTransaction } from "wagmi"
 
 interface ApproveProps {
   contractAddress: string
@@ -12,6 +15,7 @@ interface ApproveProps {
 }
 const Approve = ({ contractAddress, refetchIsApproved }: ApproveProps) => {
   const { isArbiter } = useStandardAccountRoles(contractAddress)
+  const { amountForm, setDefaultAmount } = useValidatedForms()
   const { releasedAmount, refetch: refetchReleasedAmount } =
     useReleasedAmount(contractAddress)
   const { data: approveResult, write: writeApprove } = useContractWrite({
@@ -24,9 +28,10 @@ const Approve = ({ contractAddress, refetchIsApproved }: ApproveProps) => {
     hash: approveResult?.hash,
     confirmations: 1,
     onSuccess(data) {
-      refetchIsApproved()
-      toast.success(`${formatEther(releasedAmount)} released to beneficiary`)
       refetchReleasedAmount()
+      // setDefaultAmount(formatEther(releasedAmount))
+      toast.success(`${formatEther(releasedAmount)} released to beneficiary`)
+      refetchIsApproved()
     },
   })
   return (

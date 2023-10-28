@@ -1,18 +1,14 @@
 "use client"
-import * as z from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { formatEther, parseEther } from "viem"
-import { set, useForm } from "react-hook-form"
 import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi"
 
 import { updateApprovals } from "@/action/db/customizable/approvals"
 import { revalidatePagePath } from "@/action/revalidate-path"
 
 import { customizableContractAbi } from "@/constants/abi/abis"
-import { amountSchema } from "@/form-schema/schema"
 import ConfirmModal from "@/components/confirm-modal"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useCustomizableAccountRoles } from "@/hooks/useCustomizableAccountRoles"
 import { Button } from "@/components/ui/button"
 import { useContractBalance } from "@/hooks/useContractBalance"
@@ -21,6 +17,7 @@ import { useTotalReleasedAmount } from "@/hooks/useTotalReleasedAmount"
 import { useBeneficiaryBalance } from "@/hooks/useBeneficiaryBalance"
 import ConfirmAmountField from "@/components/input-form-fields/confirm-modal-fields/confirm-amount-field"
 import { handleModalState } from "@/lib/utils"
+import { useValidatedForms } from "@/hooks/useValidatedForms"
 
 interface ApproveProps {
   contractAddress: `0x${string}`
@@ -30,17 +27,12 @@ interface ApproveProps {
 const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
   const [open, setOpen] = useState(false)
   const { isArbiter } = useCustomizableAccountRoles(contractAddress)
-  const { refetch: refetchContractBalance } =
+  const { contractBalance, refetch: refetchContractBalance } =
     useContractBalance(contractAddress)
   const { refetch: refetchTotalReleasedAmount } =
     useTotalReleasedAmount(contractAddress)
 
-  const amountForm = useForm<z.infer<typeof amountSchema>>({
-    resolver: zodResolver(amountSchema),
-    defaultValues: {
-      amount: "",
-    },
-  })
+  const { amountForm } = useValidatedForms()
 
   const { address: accountAddress } = useAccount()
   const { data: requestAmount, refetch: refetchRequestAmount } =
@@ -72,7 +64,13 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
     writeApprove?.({ args: [parseEther(amountForm.getValues("amount"))] })
   }
 
+  //TODO: Why is formattedRequestAmount bigint?
   const formattedRequestAmount = requestAmount && formatEther(requestAmount)
+  useEffect(() => {
+    console.log(typeof formattedRequestAmount)
+    console.log(formattedRequestAmount)
+  }, [formattedRequestAmount])
+
   return (
     <div className="flex">
       <ConfirmModal
@@ -84,7 +82,11 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
           <Button
             variant={isArbiter ? "gradient" : "outline"}
             className="w-full"
-            disabled={!isArbiter || formattedRequestAmount === "0"}
+            disabled={
+              !isArbiter ||
+              formattedRequestAmount?.toString() === "0" ||
+              contractBalance === "0"
+            }
           >
             Approve
           </Button>

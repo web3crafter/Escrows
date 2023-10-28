@@ -1,27 +1,17 @@
 "use client"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { parseEther } from "viem"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
 import { Dispatch, SetStateAction } from "react"
+import * as z from "zod"
 
-import {
-  addressSchema,
-  amountSchema,
-  arbiterSchema,
-  beneficiarySchema,
-  managerSchema,
-} from "@/form-schema/schema"
-import { useIsMounted } from "@/hooks/useIsMounted"
-
-import { Card, CardDescription, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ContractCreation } from "@/types/types"
-import BeneficiaryField from "@/components/input-form-fields/beneficiary-field"
-import ArbiterField from "@/components/input-form-fields/arbiter-field"
-import ManagerField from "@/components/input-form-fields/manager-field"
-import AmountField from "@/components/input-form-fields/amount-field"
+import { addressSchema, amountSchema } from "@/form-schema/schema"
 import { cn } from "@/lib/utils"
+import { ContractCreation } from "@/types/types"
+import { useIsMounted } from "@/hooks/useIsMounted"
+import { useValidatedForms } from "@/hooks/useValidatedForms"
+
+import { Card, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import AmountField from "@/components/input-form-fields/amount-field"
 import AddressField from "@/components/input-form-fields/address-field"
 
 interface CreateCardProps {
@@ -35,40 +25,9 @@ export const CreateCard: React.FC<CreateCardProps> = ({
   className,
 }) => {
   const { beneficiary, arbiters, managers, amount } = contract
+  const { amountForm, arbiterForm, managerForm, beneficiaryForm } =
+    useValidatedForms()
   const isMounted = useIsMounted()
-
-  const managerForm = useForm<z.infer<typeof managerSchema>>({
-    resolver: zodResolver(managerSchema),
-    defaultValues: {
-      address: "",
-    },
-  })
-  const arbiterForm = useForm<z.infer<typeof arbiterSchema>>({
-    resolver: zodResolver(arbiterSchema),
-    defaultValues: {
-      address: "",
-    },
-  })
-  const beneficiaryForm = useForm<z.infer<typeof beneficiarySchema>>({
-    resolver: zodResolver(beneficiarySchema),
-    defaultValues: {
-      address: "",
-    },
-  })
-
-  const amountForm = useForm<z.infer<typeof amountSchema>>({
-    resolver: zodResolver(amountSchema),
-    defaultValues: {
-      amount: "",
-    },
-  })
-
-  const addressForm = useForm<z.infer<typeof addressSchema>>({
-    resolver: zodResolver(addressSchema),
-    defaultValues: {
-      address: "",
-    },
-  })
 
   const addBeneficiary = (value: z.infer<typeof addressSchema>) => {
     setContract({
@@ -87,7 +46,7 @@ export const CreateCard: React.FC<CreateCardProps> = ({
   }
 
   const addArbiter = (value: z.infer<typeof addressSchema>) => {
-    if (contract.arbiters.includes(value.address)) {
+    if (arbiters.includes(value.address)) {
       console.log("Address already added as an arbiter")
     } else {
       setContract({
@@ -99,7 +58,7 @@ export const CreateCard: React.FC<CreateCardProps> = ({
   }
 
   const addManager = (value: z.infer<typeof addressSchema>) => {
-    if (contract.managers.includes(value.address)) {
+    if (managers.includes(value.address)) {
       console.log("Address already added as an manager")
     } else {
       setContract({
@@ -111,7 +70,7 @@ export const CreateCard: React.FC<CreateCardProps> = ({
   }
 
   if (!isMounted) return null
-  //TODO: use one field for, all addresses?
+
   return (
     <Card className={cn("py-12 space-y-12", className)}>
       <CardTitle>Create Contract</CardTitle>
@@ -121,8 +80,8 @@ export const CreateCard: React.FC<CreateCardProps> = ({
       <div className="space-y-12">
         <div className="space-y-8">
           <div className="space-y-8 lg:space-y-0 lg:gap-5 lg:flex ">
-            {/* <AddressField
-              addressForm={addressForm}
+            <AddressField
+              addressForm={beneficiaryForm}
               addAction={addBeneficiary}
               disabled={beneficiary !== ""}
               label="Beneficiary of this contract"
@@ -130,37 +89,22 @@ export const CreateCard: React.FC<CreateCardProps> = ({
               className="lg:flex-1"
             />
             <AddressField
-              addressForm={addressForm}
+              addressForm={arbiterForm}
               addAction={addArbiter}
               label="Arbiters of this contract"
               optionalOrRequiredLabel="one or more required"
               className="lg:flex-1"
-            /> */}
-            <BeneficiaryField
-              beneficiary={beneficiary}
-              beneficiaryForm={beneficiaryForm}
-              addBeneficiary={addBeneficiary}
-              className="lg:flex-1"
-            />
-            <ArbiterField
-              arbiterForm={arbiterForm}
-              addArbiter={addArbiter}
-              className="lg:flex-1"
             />
           </div>
           <div className="space-y-8 lg:space-y-0 lg:gap-5 lg:flex">
-            {/* <AddressField
-              addressForm={addressForm}
+            <AddressField
+              addressForm={managerForm}
               addAction={addManager}
               label="Managers of this contract"
               optionalOrRequiredLabel="one or more optional"
               className="lg:flex-1"
-            /> */}
-            <ManagerField
-              managerForm={managerForm}
-              addManager={addManager}
-              className="lg:flex-1"
             />
+
             <AmountField
               amountForm={amountForm}
               confirmAction={addAmount}

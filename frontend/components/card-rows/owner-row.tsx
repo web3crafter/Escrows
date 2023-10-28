@@ -2,7 +2,7 @@ import CardRow from "@/components/card-row"
 import { HoverCopy } from "@/components/hover-copy"
 import { formatAddress } from "@/lib/utils"
 
-const ContractOwner = ({ owner }: { owner: string }) => {
+const OwnerRow = ({ owner }: { owner: string }) => {
   return (
     <CardRow
       label="Contract Owner"
@@ -10,4 +10,4 @@ const ContractOwner = ({ owner }: { owner: string }) => {
     />
   )
 }
-export default ContractOwner
+export default OwnerRow

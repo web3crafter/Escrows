@@ -1,8 +1,6 @@
 "use client"
 import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { decodeEventLog } from "viem"
-import { useForm } from "react-hook-form"
 import { useState } from "react"
 
 import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi"
@@ -22,6 +20,7 @@ import { TrashIcon } from "lucide-react"
 import ConfirmMessageAndButtons from "@/app/contract/customizable/[address]/components/contract-section/confirm-message-and-buttons"
 import ConfirmAddressField from "@/components/input-form-fields/confirm-modal-fields/confirm-address-field"
 import { toast } from "sonner"
+import { useValidatedForms } from "@/hooks/useValidatedForms"
 
 interface ArbitersComponentProps {
   contractAddress: `0x${string}`
@@ -31,12 +30,7 @@ const ArbitersComponent: React.FC<ArbitersComponentProps> = ({
   arbiters,
   contractAddress,
 }) => {
-  const arbiterForm = useForm<z.infer<typeof addressSchema>>({
-    resolver: zodResolver(addressSchema),
-    defaultValues: {
-      address: "",
-    },
-  })
+  const { arbiterForm } = useValidatedForms()
 
   const [open, setOpen] = useState(false)
   const [openRemoveArbiter, setOpenRemoveArbiter] = useState(false)

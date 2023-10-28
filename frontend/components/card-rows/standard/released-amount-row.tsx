@@ -5,7 +5,7 @@ import { useContractBalance } from "@/hooks/useContractBalance"
 import { useReleasedAmount } from "@/hooks/useReleasedAmount"
 import { formatEther } from "viem"
 
-const ContractReleasedAmount = ({
+const ReleasedAmountRow = ({
   contractAddress,
 }: {
   contractAddress: string
@@ -19,4 +19,4 @@ const ContractReleasedAmount = ({
     />
   )
 }
-export default ContractReleasedAmount
+export default ReleasedAmountRow

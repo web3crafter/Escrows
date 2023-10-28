@@ -1,9 +1,6 @@
-import CardRow from "@/components/card-row"
-import ContractArbiter from "@/components/card-rows/contract-arbiter"
-import ContractOwner from "@/components/card-rows/contract-owner"
-import ContractRecipient from "@/components/card-rows/contract-recipient"
-import { HoverCopy } from "@/components/hover-copy"
-import { formatAddress } from "@/lib/utils"
+import ArbiterRow from "@/components/card-rows/arbiter-row"
+import OwnerRow from "@/components/card-rows/owner-row"
+import RecipientRow from "@/components/card-rows/recipient-row"
 
 interface AddressInfoSectionProps {
   deployer: string
@@ -17,9 +14,9 @@ const AddressInfoSection = ({
 }: AddressInfoSectionProps) => {
   return (
     <div className="space-y-4">
-      <ContractOwner owner={deployer} />
-      <ContractArbiter arbiter={arbiter} />
-      <ContractRecipient beneficiary={beneficiary} />
+      <OwnerRow owner={deployer} />
+      <ArbiterRow arbiter={arbiter} />
+      <RecipientRow beneficiary={beneficiary} />
     </div>
   )
 }

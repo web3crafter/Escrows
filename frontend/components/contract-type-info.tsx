@@ -1,5 +1,6 @@
-import { CallToActionButton } from "@/components/call-to-action-button"
 import { cn } from "@/lib/utils"
+
+import { CallToActionButton } from "@/components/call-to-action-button"
 
 interface ContractTypeInfoProps {
   title: string

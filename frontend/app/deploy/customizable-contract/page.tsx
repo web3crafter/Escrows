@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { TransactionReceiptNotFoundErrorType } from "viem"
+import { toast } from "sonner"
 
 import { useAccount, useWaitForTransaction, useWalletClient } from "wagmi"
 import { useIsMounted } from "@/hooks/useIsMounted"
@@ -15,7 +16,6 @@ import { ContractCreation } from "@/types/types"
 
 import { OverviewCard } from "@/app/deploy/customizable-contract/components/overview-card"
 import { CreateCard } from "@/app/deploy/customizable-contract/components/create-card"
-import { toast } from "sonner"
 
 const AdvancedContractPage = () => {
   const [isInteracting, setIsInteracting] = useState(false)

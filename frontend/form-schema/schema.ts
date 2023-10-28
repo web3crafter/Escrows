@@ -1,6 +1,7 @@
 import { isAddress } from "viem"
 import { z } from "zod"
 
+//TODO: amount: z.number
 export const validAddressSchema = z
   .string()
   .refine((value) => isAddress(value), "Invalid Ethereum Address")
@@ -13,30 +14,8 @@ export const CreateStandardContractSchema = z.object({
   }),
 })
 
-export const contractSchema = z.object({
-  address: validAddressSchema,
-  arbiterAddress: validAddressSchema,
-  beneficiaryAddress: validAddressSchema,
-  managerAddress: validAddressSchema,
-  amount: z.string().min(1, {
-    message: "amount needs to be greater than zero",
-  }),
-})
-
 export const addressSchema = z.object({
   address: validAddressSchema,
 })
 
-export const managerSchema = z.object({
-  address: validAddressSchema,
-})
-
-export const arbiterSchema = z.object({
-  address: validAddressSchema,
-})
-
-export const beneficiarySchema = z.object({
-  address: validAddressSchema,
-})
-
-export const amountSchema = contractSchema.pick({ amount: true })
+export const amountSchema = CreateStandardContractSchema.pick({ amount: true })

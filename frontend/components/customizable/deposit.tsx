@@ -1,8 +1,6 @@
 "use client"
 
 import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
 import { parseEther } from "viem"
 
 import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi"
@@ -19,6 +17,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useCustomizableAccountRoles } from "@/hooks/useCustomizableAccountRoles"
 import { handleModalState } from "@/lib/utils"
+import { useValidatedForms } from "@/hooks/useValidatedForms"
 
 interface DepositProps {
   contractAddress: `0x${string}`
@@ -30,12 +29,7 @@ const Deposit = ({ contractAddress }: DepositProps) => {
     useCustomizableAccountRoles(contractAddress)
   const { refetch: refetchContractBalance } =
     useContractBalance(contractAddress)
-  const amountForm = useForm<z.infer<typeof amountSchema>>({
-    resolver: zodResolver(amountSchema),
-    defaultValues: {
-      amount: "",
-    },
-  })
+  const { amountForm } = useValidatedForms()
   const { data: depositResult, write: writeDeposit } = useContractWrite({
     address: contractAddress,
     abi: customizableContractAbi,

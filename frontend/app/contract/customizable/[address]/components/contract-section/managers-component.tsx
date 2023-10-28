@@ -1,4 +1,5 @@
 "use client"
+
 import { updateManagers } from "@/action/db/customizable/managers"
 import { revalidatePagePath } from "@/action/revalidate-path"
 import ConfirmMessageAndButtons from "@/app/contract/customizable/[address]/components/contract-section/confirm-message-and-buttons"
@@ -9,11 +10,10 @@ import { Button } from "@/components/ui/button"
 import { customizableContractAbi } from "@/constants/abi/abis"
 import { addressSchema } from "@/form-schema/schema"
 import { useCustomizableAccountRoles } from "@/hooks/useCustomizableAccountRoles"
+import { useValidatedForms } from "@/hooks/useValidatedForms"
 import { formatAddress, handleModalState } from "@/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { TrashIcon } from "lucide-react"
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useState } from "react"
 import { toast } from "sonner"
 import { decodeEventLog } from "viem"
 import { useContractWrite, useWaitForTransaction } from "wagmi"
@@ -27,12 +27,7 @@ const ManagersComponent: React.FC<ManagersComponentProps> = ({
   managers,
   contractAddress,
 }) => {
-  const managerForm = useForm<z.infer<typeof addressSchema>>({
-    resolver: zodResolver(addressSchema),
-    defaultValues: {
-      address: "",
-    },
-  })
+  const { managerForm } = useValidatedForms()
 
   const [open, setOpen] = useState(false)
   const [openRemoveManager, setOpenRemoveManager] = useState(false)

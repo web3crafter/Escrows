@@ -5,13 +5,13 @@ import { ICustomizableEscrow } from "@/types/types"
 import { Card } from "@/components/ui/card"
 import ContractAddressSection from "@/app/contracts/components/contract-address-section"
 import AddressArraySection from "@/app/contracts/components/customizable/address-array-section"
-import ContractBalance from "@/components/card-rows/contract-balance"
-import ContractOwner from "@/components/card-rows/contract-owner"
-import ContractRecipient from "@/components/card-rows/contract-recipient"
 import { Separator } from "@/components/ui/separator"
 import ActionSection from "@/app/contracts/components/customizable/action-section"
-import RequestedAmount from "@/components/card-rows/customizable/requested-amount"
 import { cn } from "@/lib/utils"
+import RecipientRow from "@/components/card-rows/recipient-row"
+import RequestedAmountRow from "@/components/card-rows/customizable/requested-amount-row"
+import ContractBalanceRow from "@/components/card-rows/contract-balance-row"
+import OwnerRow from "@/components/card-rows/owner-row"
 
 interface CustomizableContractCardProps {
   contract: ICustomizableEscrow
@@ -42,15 +42,15 @@ const CustomizableContractCard: React.FC<CustomizableContractCardProps> = ({
       />
 
       <div className="space-y-4 ">
-        <ContractRecipient beneficiary={beneficiary} />
-        <RequestedAmount contractAddress={contractAddress} />
+        <RecipientRow beneficiary={beneficiary} />
+        <RequestedAmountRow contractAddress={contractAddress} />
       </div>
 
       <Separator />
 
       <div className="space-y-4">
-        <ContractBalance contractAddress={contractAddress} />
-        <ContractOwner owner={deployer} />
+        <ContractBalanceRow contractAddress={contractAddress} />
+        <OwnerRow owner={deployer} />
       </div>
 
       <Separator />

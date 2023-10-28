@@ -1,8 +1,6 @@
 "use client"
 
 import { amountSchema } from "@/form-schema/schema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useContractWrite, useWaitForTransaction } from "wagmi"
 import { customizableContractAbi } from "@/constants/abi/abis"
@@ -16,18 +14,14 @@ import { Button } from "@/components/ui/button"
 import { useCustomizableAccountRoles } from "@/hooks/useCustomizableAccountRoles"
 import { useContractBalance } from "@/hooks/useContractBalance"
 import { handleModalState } from "@/lib/utils"
+import { useValidatedForms } from "@/hooks/useValidatedForms"
 
 interface RequestProps {
   contractAddress: `0x${string}`
 }
 
 const RequestETHAmount = ({ contractAddress }: RequestProps) => {
-  const amountForm = useForm<z.infer<typeof amountSchema>>({
-    resolver: zodResolver(amountSchema),
-    defaultValues: {
-      amount: "",
-    },
-  })
+  const { amountForm } = useValidatedForms()
 
   const [open, setOpen] = useState(false)
   const { isBeneficiary } = useCustomizableAccountRoles(contractAddress)

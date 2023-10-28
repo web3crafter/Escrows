@@ -3,7 +3,11 @@ import ETHLogo from "@/components/eth-logo"
 import { useRequestAmount } from "@/hooks/useRequestAmount"
 import { formatEther } from "viem"
 
-const RequestedAmount = ({ contractAddress }: { contractAddress: string }) => {
+const RequestedAmountRow = ({
+  contractAddress,
+}: {
+  contractAddress: string
+}) => {
   const { data: requestedAmount } = useRequestAmount(contractAddress)
 
   return (
@@ -19,4 +23,4 @@ const RequestedAmount = ({ contractAddress }: { contractAddress: string }) => {
     </div>
   )
 }
-export default RequestedAmount
+export default RequestedAmountRow

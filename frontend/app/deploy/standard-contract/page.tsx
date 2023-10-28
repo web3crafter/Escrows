@@ -1,43 +1,33 @@
 "use client"
 import { TransactionReceiptNotFoundErrorType, parseEther } from "viem"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { toast } from "sonner"
 
-import { useIsMounted } from "@/hooks/useIsMounted"
-import { CreateStandardContractSchema } from "@/form-schema/schema"
+import Escrow from "@/artifacts/contracts/Escrow.sol/Escrow.json"
+import { standardContractAbi } from "@/constants/abi/abis"
+import { storeContractAddress } from "@/action/db/store-contract-address"
 import { revalidatePagePath } from "@/action/revalidate-path"
+import { CreateStandardContractSchema } from "@/form-schema/schema"
+import { useIsMounted } from "@/hooks/useIsMounted"
+import { useValidatedForms } from "@/hooks/useValidatedForms"
 
 import { Card, CardFooter, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { SpinnerButton } from "@/components/spinner-button"
-import { SimpleContractSkeleton } from "@/app/deploy/standard-contract/components/deploy-skeleton"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { storeContractAddress } from "@/action/db/store-contract-address"
+import CustomConnectButton from "@/components/custom-connect-button"
+import StandardDeploySkeleton from "@/app/deploy/standard-contract/components/standard-deploy-skeleton"
+import { Form } from "@/components/ui/form"
 import {
   sepolia,
   useAccount,
   useWaitForTransaction,
   useWalletClient,
 } from "wagmi"
-import { standardContractAbi } from "@/constants/abi/abis"
-import Escrow from "@/artifacts/contracts/Escrow.sol/Escrow.json"
-import { toast } from "sonner"
-import CustomConnectButton from "@/components/custom-connect-button"
+import DeployStandardFormField from "@/app/deploy/standard-contract/components/deploy-standard-form-field"
 
-//TODO: Clean up code and make components
 const StandardContractPage = () => {
   const isMounted = useIsMounted()
   const router = useRouter()
@@ -49,16 +39,7 @@ const StandardContractPage = () => {
     chainId: sepolia.id,
   })
 
-  const standardContractForm = useForm<
-    z.infer<typeof CreateStandardContractSchema>
-  >({
-    resolver: zodResolver(CreateStandardContractSchema),
-    defaultValues: {
-      arbiterAddress: "",
-      beneficiaryAddress: "",
-      amount: "",
-    },
-  })
+  const { createStandardContractForm } = useValidatedForms()
 
   const { data: deployedContract, status: deploymentStatus } =
     useWaitForTransaction({
@@ -73,7 +54,7 @@ const StandardContractPage = () => {
             description: `Contract Address: ${contractAddress}`,
           })
 
-          standardContractForm.reset()
+          createStandardContractForm.reset()
           await revalidatePagePath("/contracts")
           router.push(`/contract/standard/${contractAddress}`)
         }
@@ -112,79 +93,46 @@ const StandardContractPage = () => {
   }
 
   if (!isMounted) {
-    return <SimpleContractSkeleton />
+    return <StandardDeploySkeleton />
   }
   return (
     <main className="container flex flex-col items-center space-y-5 ">
       <Card className="w-full px-8 py-12 space-y-12 dark:bg-secondary bg-secondary md:w-fit">
         <CardTitle>New Contract</CardTitle>
-        <Form {...standardContractForm}>
+        <Form {...createStandardContractForm}>
           <form
-            onSubmit={standardContractForm.handleSubmit(onSubmit)}
+            onSubmit={createStandardContractForm.handleSubmit(onSubmit)}
             className="space-y-12"
           >
-            {/* Form fields for arbiter and beneficiary addresses */}
             <div className="space-y-8">
               <div className="md:gap-5 md:flex">
-                <FormField
-                  control={standardContractForm.control}
+                <DeployStandardFormField
+                  createStandardContractForm={createStandardContractForm}
                   name="beneficiaryAddress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Beneficiary Address</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="md:w-80" />
-                      </FormControl>
-                      <FormDescription>
-                        Address of the Beneficiary
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Recipient Address"
                 />
-                <FormField
-                  control={standardContractForm.control}
+                <DeployStandardFormField
+                  createStandardContractForm={createStandardContractForm}
                   name="arbiterAddress"
-                  render={({ field }) => (
-                    <FormItem className="">
-                      <FormLabel>Arbiter Address</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="md:w-80" />
-                      </FormControl>
-                      <FormDescription>Address of the Arbiter</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Arbiter Address"
                 />
               </div>
 
               <Separator className="bg-primary" />
 
-              {/* Form field for amount */}
-              <FormField
-                control={standardContractForm.control}
+              <DeployStandardFormField
+                createStandardContractForm={createStandardContractForm}
                 name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <Input {...field} className="md:w-80 " />
-                    </FormControl>
-                    <FormDescription>
-                      Amount of Ethereum to send
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Amount"
+                description="Amount of Ethereum to send"
               />
             </div>
 
-            {/* Form buttons */}
             <CardFooter className="flex justify-between">
               <Button
                 variant={"ghost"}
                 type="button"
-                onClick={() => standardContractForm.reset()}
+                onClick={() => createStandardContractForm.reset()}
                 className="mt-5 "
               >
                 Reset

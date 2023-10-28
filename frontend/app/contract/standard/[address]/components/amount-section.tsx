@@ -1,11 +1,7 @@
 "use client"
-import CardRow from "@/components/card-row"
-import ContractBalance from "@/components/card-rows/contract-balance"
-import ContractReleasedAmount from "@/components/card-rows/standard/contract-released-amount"
-import ETHLogo from "@/components/eth-logo"
+import ContractBalanceRow from "@/components/card-rows/contract-balance-row"
+import ReleasedAmountRow from "@/components/card-rows/standard/released-amount-row"
 import { useContractBalance } from "@/hooks/useContractBalance"
-import { useReleasedAmount } from "@/hooks/useReleasedAmount"
-import { formatEther } from "viem"
 
 interface AmountSectionProps {
   contractAddress: string
@@ -16,9 +12,9 @@ const AmountSection = ({ contractAddress }: AmountSectionProps) => {
   return (
     <div>
       {Number(contractBalance) === 0 ? (
-        <ContractReleasedAmount contractAddress={contractAddress} />
+        <ReleasedAmountRow contractAddress={contractAddress} />
       ) : (
-        <ContractBalance contractAddress={contractAddress} />
+        <ContractBalanceRow contractAddress={contractAddress} />
       )}
     </div>
   )
