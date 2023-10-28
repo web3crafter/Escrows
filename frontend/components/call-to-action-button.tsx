@@ -26,7 +26,7 @@ export const CallToActionButton = ({
       className={cn("w-fit place-self-center ", className)}
       variant={"gradient"}
     >
-      <Link href={href} className="text-center">
+      <Link href={href} className="text-center capitalize">
         {label}
       </Link>
     </Button>

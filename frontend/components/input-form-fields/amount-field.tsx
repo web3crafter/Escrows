@@ -46,14 +46,16 @@ const AmountField: React.FC<AmountFieldProps> = ({
           name="amount"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>
+              <FormLabel className="flex flex-col gap-2">
                 {label ? (
                   label
                 ) : (
-                  <p className="flex flex-col">
-                    Amount of ETH to deposit{" "}
+                  <>
+                    <span className="text-base font-semibold">
+                      Ethereum to deposit{" "}
+                    </span>
                     <span className="text-neutral-500">(optional)</span>{" "}
-                  </p>
+                  </>
                 )}
               </FormLabel>
               <FormControl>

@@ -8,6 +8,7 @@ const ETHLogo = ({ className }: ETHLogoProps) => {
   return (
     <div className={cn("w-4 h-4 flex items-center ", className)}>
       <FaEthereum className={cn("w-full h-full")} />
+      <span className="sr-only">Ethereum Logo</span>
     </div>
   )
 }

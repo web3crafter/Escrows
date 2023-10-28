@@ -47,13 +47,11 @@ const AddressField: React.FC<AddressFieldProps> = ({
           name="address"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>
-                <p className="flex flex-col">
-                  {label}
-                  <span className="text-neutral-500">
-                    ({optionalOrRequiredLabel})
-                  </span>{" "}
-                </p>
+              <FormLabel className="flex flex-col gap-2">
+                <span className="text-base font-semibold">{label}</span>
+                <span className="text-neutral-500">
+                  ({optionalOrRequiredLabel})
+                </span>{" "}
               </FormLabel>
               <FormControl>
                 <Input {...field} />

@@ -58,8 +58,8 @@ const DeployerSection = ({
 
       {!isApproved && (
         <div className="flex items-center ">
+          <p>Sent {formatEther(releasedAmount)}</p>
           <ETHLogo className="" />
-          <p>Sent {formatEther(releasedAmount)} ETH</p>
         </div>
       )}
 

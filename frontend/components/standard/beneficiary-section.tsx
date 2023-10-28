@@ -21,16 +21,14 @@ const BeneficiarySection = ({
   return (
     <div className="flex items-center justify-between">
       <div className="sm:flex sm:items-center sm:space-x-2">
-        <Typography variant={"largeText"} as="div">
-          Recipient
-        </Typography>
+        <p className="text-lg font-semibold">Recipient</p>
         <HoverCopy trigger={formatAddress(beneficiary)} content={beneficiary} />
       </div>
 
       {isApproved === true && (
         <div className="flex items-center">
+          <p>Received {isApproved && formatEther(releasedAmount)}</p>
           <ETHLogo />
-          <p>Received {isApproved && formatEther(releasedAmount)} ETH</p>
         </div>
       )}
     </div>

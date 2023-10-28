@@ -1,4 +1,4 @@
-import { addressSchema } from "@/form-schema/schema"
+import { addressSchema, validAddressSchema } from "@/form-schema/schema"
 import { PromiseResult } from "@/types/types"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
@@ -12,7 +12,7 @@ export const formatAddress = (address: string) => {
 }
 
 export const validateAddressWithZod = (address: string) => {
-  return addressSchema.safeParse(address)
+  return validAddressSchema.safeParse(address)
 }
 
 export const findPathName = (pathName: string) => {

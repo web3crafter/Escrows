@@ -1,5 +1,6 @@
 "use client"
 
+import ETHLogo from "@/components/eth-logo"
 import { SpinnerButton } from "@/components/spinner-button"
 import {
   Form,
@@ -64,7 +65,7 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Deposit with new amount</FormLabel>
+              <FormLabel>Deposit amount</FormLabel>
               <div className="flex w-full space-x-1">
                 <FormControl>
                   <Input {...field} />
@@ -81,7 +82,7 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
                     amountForm.getValues("amount") === "0"
                   }
                 >
-                  {`Deposit ${amountForm.getValues("amount")} ETH`}
+                  Deposit
                 </SpinnerButton>
               </div>
             </FormItem>
