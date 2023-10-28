@@ -1,3 +1,5 @@
+"use client"
+
 import { HoverCopy } from "@/components/hover-copy"
 import { Typography } from "@/components/ui/typography"
 import { useIsApproved } from "@/hooks/useIsApproved"

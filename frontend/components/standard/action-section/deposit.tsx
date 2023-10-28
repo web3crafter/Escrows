@@ -1,8 +1,6 @@
 "use client"
 
-import ETHLogo from "@/components/eth-logo"
 import { SpinnerButton } from "@/components/spinner-button"
-import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -15,12 +13,10 @@ import { Input } from "@/components/ui/input"
 import { standardContractAbi } from "@/constants/abi/abis"
 import { amountSchema } from "@/form-schema/schema"
 import { useContractBalance } from "@/hooks/useContractBalance"
-import { useReleasedAmount } from "@/hooks/useReleasedAmount"
 import { useStandardAccountRoles } from "@/hooks/useStandardAccountRoles"
 import { useValidatedForms } from "@/hooks/useValidatedForms"
-import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import { formatEther, parseEther } from "viem"
+import { parseEther } from "viem"
 import { useContractWrite, useWaitForTransaction } from "wagmi"
 import { z } from "zod"
 
@@ -32,10 +28,8 @@ interface DepositProps {
 const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
   const { refetch: refetchContractBalance } =
     useContractBalance(contractAddress)
-  const { releasedAmount } = useReleasedAmount(contractAddress)
   const { isDeployer } = useStandardAccountRoles(contractAddress)
   const { amountForm } = useValidatedForms()
-  // setDefaultAmount(formatEther(releasedAmount))
 
   const { data: depositResult, write: writeDeposit } = useContractWrite({
     address: contractAddress as `0x${string}`,
@@ -70,7 +64,7 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Deposit with same amount or new amount</FormLabel>
+              <FormLabel>Deposit with new amount</FormLabel>
               <div className="flex w-full space-x-1">
                 <FormControl>
                   <Input {...field} />
@@ -89,22 +83,6 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
                 >
                   {`Deposit ${amountForm.getValues("amount")} ETH`}
                 </SpinnerButton>
-                {/* <SpinnerButton
-                  type="button"
-                  variant={"gradient"}
-                  disabled={
-                    depositedStatus === "loading" ||
-                    !isDeployer ||
-                    amountForm.getValues("amount") ===
-                      formatEther(releasedAmount)
-                  }
-                  className={cn(
-                    amountForm.getValues("amount") ===
-                      formatEther(releasedAmount) && "hidden"
-                  )}
-                >
-                  {`Deposit ${formatEther(releasedAmount)}`} <ETHLogo />
-                </SpinnerButton> */}
               </div>
             </FormItem>
           )}

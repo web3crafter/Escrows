@@ -1,6 +1,6 @@
 "use client"
-import Approve from "@/app/contract/standard/[address]/components/action-section/aprove"
-import Deposit from "@/app/contract/standard/[address]/components/action-section/deposit"
+import Approve from "@/components/standard/action-section/approve"
+import Deposit from "@/components/standard/action-section/deposit"
 import { Button } from "@/components/ui/button"
 import { useIsApproved } from "@/hooks/useIsApproved"
 import { useStandardAccountRoles } from "@/hooks/useStandardAccountRoles"
@@ -14,7 +14,7 @@ const ActionSection = ({ contractAddress }: ActionSectionProps) => {
     useIsApproved(contractAddress)
 
   return (
-    <div>
+    <div className="mt-4">
       {isApproved ? (
         isDeployer && (
           <Deposit

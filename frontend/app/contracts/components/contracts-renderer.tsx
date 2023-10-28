@@ -1,5 +1,5 @@
 import CustomizableContractCard from "@/app/contracts/components/customizable/customizable-contract-card"
-import StandardContractCard from "@/app/contracts/components/standard/standard-contract-card"
+import StandardContractCard from "@/app/contracts/components/standard-contract-card"
 import { IEscrow, ICustomizableEscrow } from "@/types/types"
 import { z } from "zod"
 
@@ -38,7 +38,7 @@ const ContractsRenderer = ({ contracts }: ContractsRendererProps) => {
           <StandardContractCard
             key={individualContract?.contractAddress}
             contract={individualContract}
-            className="w-full max-w-2xl px-2 sm:px-8"
+            className="w-full max-w-2xl "
           />
         ))}
 
@@ -48,7 +48,7 @@ const ContractsRenderer = ({ contracts }: ContractsRendererProps) => {
           <CustomizableContractCard
             key={individualContract.contractAddress}
             contract={individualContract}
-            className="w-full max-w-2xl px-2 sm:px-8 h-full"
+            className="w-full h-full max-w-2xl px-2 sm:px-8"
           />
         ))}
     </div>

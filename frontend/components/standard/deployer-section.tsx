@@ -1,3 +1,5 @@
+"use client"
+
 import ETHLogo from "@/components/eth-logo"
 import { HoverCopy } from "@/components/hover-copy"
 import { SpinnerButton } from "@/components/spinner-button"
@@ -70,7 +72,9 @@ const DeployerSection = ({
           loading={depositedStatus === "loading"}
           className="sm:h-7"
         >
-          Deposit same amount
+          <div className="flex">
+            {`Deposit ${formatEther(releasedAmount)}`} <ETHLogo />
+          </div>
         </SpinnerButton>
       )}
     </div>

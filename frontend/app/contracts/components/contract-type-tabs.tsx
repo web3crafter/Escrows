@@ -1,19 +1,22 @@
 "use client"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react"
+import { useAccount } from "wagmi"
+
 import {
   IEscrow,
   ICustomizableEscrow,
   EscrowType,
   FilterKey,
 } from "@/types/types"
-import { useState } from "react"
+import { useIsMounted } from "@/hooks/useIsMounted"
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ContractsRenderer from "@/app/contracts/components/contracts-renderer"
 import NoRoleNotConnected from "@/app/contracts/components/no-role-not-connected"
 import RoleSelect from "@/app/contracts/components/role-select"
 import { Label } from "@/components/ui/label"
-import { useAccount } from "wagmi"
-import { useIsMounted } from "@/hooks/useIsMounted"
+import TabsNav from "@/app/contracts/components/tabs-nav"
 
 interface ContractTypeTabsProps {
   standardContracts: IEscrow[]
@@ -61,45 +64,12 @@ const ContractTypeTabs = ({
       defaultValue="standard"
       className="flex flex-col items-center space-y-4"
     >
-      <div className="w-full sm:flex sm:items-end sm:justify-between">
-        <div className="flex flex-col">
-          <Label htmlFor="contract-type">Contract Type</Label>
-          <TabsList id="contract-type" className="px-0 w-fit">
-            <TabsTrigger
-              value="standard"
-              onClick={() => {
-                setActiveTab("standard")
-                if (keyToFilterOn === "managers") {
-                  setKeyToFilterOn("all_contracts")
-                } else if (keyToFilterOn === "arbiters") {
-                  setKeyToFilterOn("arbiter")
-                }
-              }}
-            >
-              Standard
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="customizable"
-              onClick={() => {
-                setActiveTab("customizable")
-                if (keyToFilterOn === "arbiter") {
-                  setKeyToFilterOn("arbiters")
-                }
-              }}
-            >
-              Customizable
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <RoleSelect
-          className="sm:self-end"
-          activeTab={activeTab}
-          setKeyToFilterOn={setKeyToFilterOn}
-          displayValue={keyToFilterOn}
-        />
-      </div>
+      <TabsNav
+        setActiveTab={setActiveTab}
+        activeTab={activeTab}
+        keyToFilterOn={keyToFilterOn}
+        setKeyToFilterOn={setKeyToFilterOn}
+      />
       <TabsContent value="standard" className="w-full">
         {filteredContract.length > 0 ? (
           <ContractsRenderer contracts={filteredContract} />

@@ -1,3 +1,5 @@
+"use client"
+
 import ETHLogo from "@/components/eth-logo"
 import { HoverCopy } from "@/components/hover-copy"
 import { Typography } from "@/components/ui/typography"

@@ -26,19 +26,22 @@ interface ApproveProps {
 
 const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
   const [open, setOpen] = useState(false)
+  const { amountForm } = useValidatedForms()
   const { isArbiter } = useCustomizableAccountRoles(contractAddress)
+  const { address: accountAddress } = useAccount()
+
   const { contractBalance, refetch: refetchContractBalance } =
     useContractBalance(contractAddress)
+
   const { refetch: refetchTotalReleasedAmount } =
     useTotalReleasedAmount(contractAddress)
 
-  const { amountForm } = useValidatedForms()
-
-  const { address: accountAddress } = useAccount()
   const { data: requestAmount, refetch: refetchRequestAmount } =
     useRequestAmount(contractAddress)
+
   const { refetch: refetchBeneficiaryBalance } =
     useBeneficiaryBalance(beneficiary)
+
   const { data: approveResult, write: writeApprove } = useContractWrite({
     address: contractAddress,
     abi: customizableContractAbi,
@@ -66,10 +69,6 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
 
   //TODO: Why is formattedRequestAmount bigint?
   const formattedRequestAmount = requestAmount && formatEther(requestAmount)
-  useEffect(() => {
-    console.log(typeof formattedRequestAmount)
-    console.log(formattedRequestAmount)
-  }, [formattedRequestAmount])
 
   return (
     <div className="flex">

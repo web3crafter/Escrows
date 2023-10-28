@@ -15,7 +15,7 @@ interface ApproveProps {
 }
 const Approve = ({ contractAddress, refetchIsApproved }: ApproveProps) => {
   const { isArbiter } = useStandardAccountRoles(contractAddress)
-  const { amountForm, setDefaultAmount } = useValidatedForms()
+  const { amountForm } = useValidatedForms()
   const { releasedAmount, refetch: refetchReleasedAmount } =
     useReleasedAmount(contractAddress)
   const { data: approveResult, write: writeApprove } = useContractWrite({

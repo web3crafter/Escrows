@@ -4,7 +4,7 @@ import PageHeading from "@/app/contract/components/page-heading"
 import ApprovalsSection from "@/app/contract/customizable/[address]/components/approvals-section"
 
 import ContractSection from "@/app/contract/customizable/[address]/components/contract-section/contract-section"
-import DepositSection from "@/app/contract/customizable/[address]/components/contract-section/deposit-section"
+import DepositSection from "@/app/contract/customizable/[address]/components/deposit-section"
 import { Card } from "@/components/ui/card"
 
 const CustomizableContractPage = async ({
@@ -37,7 +37,7 @@ const CustomizableContractPage = async ({
         <DepositSection
           contractAddress={contractAddress as `0x${string}`}
           deposits={deposits}
-          className="col-span-2 col-start-1 row-start-2  md:col-span-1 xl:col-span-1 xl:border xl:rounded-l-lg xl:row-start-1 xl:bg-secondary"
+          className="col-span-2 col-start-1 row-start-2 md:col-span-1 xl:col-span-1 xl:border xl:rounded-l-lg xl:row-start-1 xl:bg-secondary"
         />
 
         <ContractSection
