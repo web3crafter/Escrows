@@ -4,6 +4,7 @@ import ETHLogo from "@/components/eth-logo"
 import { HoverCopy } from "@/components/hover-copy"
 import { SpinnerButton } from "@/components/spinner-button"
 import { standardContractAbi } from "@/constants/abi/abis"
+import { useContractBalance } from "@/hooks/useContractBalance"
 import { useIsApproved } from "@/hooks/useIsApproved"
 import { useReleasedAmount } from "@/hooks/useReleasedAmount"
 import { useStandardAccountRoles } from "@/hooks/useStandardAccountRoles"
@@ -16,13 +17,17 @@ interface DeployerSectionProps {
   deployer: string
   contractAddress: string
 }
+
 const DeployerSection = ({
   deployer,
   contractAddress,
 }: DeployerSectionProps) => {
   const { isDeployer } = useStandardAccountRoles(contractAddress)
+  const { contractBalance, refetch: refetchContractBalance } =
+    useContractBalance(contractAddress)
   const { data: isApproved, refetch: refetchIsApproved } =
     useIsApproved(contractAddress)
+
   const { releasedAmount, refetch: refetchReleasedAmount } =
     useReleasedAmount(contractAddress)
 
@@ -36,8 +41,10 @@ const DeployerSection = ({
       hash: depositResult?.hash,
       confirmations: 1,
       onSuccess(data) {
+        toast.success(`${formatEther(releasedAmount)} Deposited`)
         refetchIsApproved()
         refetchReleasedAmount()
+        refetchContractBalance()
       },
     })
 
@@ -58,7 +65,7 @@ const DeployerSection = ({
 
       {!isApproved && (
         <div className="flex items-center ">
-          <p>Sent {formatEther(releasedAmount)}</p>
+          <p>Sent {contractBalance}</p>
           <ETHLogo className="" />
         </div>
       )}

@@ -26,19 +26,27 @@ const NoRoleNotConnected = ({ keyToFilterOn }: NoRoleNotConnectedProps) => {
   return (
     <>
       {isConnected ? (
-        <div className="flex flex-col items-center col-span-2 gap-16">
-          <p className="text-lg font-semibold">
-            No contracts found where you are the
-            <span className="capitalize"> {role(keyToFilterOn)}</span>
-          </p>
+        <Card className="flex flex-col items-center gap-8 p-4 mx-auto mt-12 w-fit">
+          {keyToFilterOn === "all_contracts" ? (
+            <p className="text-lg font-semibold">No contracts found</p>
+          ) : (
+            <p className="text-lg font-semibold">
+              No contracts found where you are the
+              <span className="capitalize"> {role(keyToFilterOn)}</span>
+            </p>
+          )}
           <CallToActionButton />
-        </div>
+        </Card>
       ) : (
-        <Card className="flex flex-col items-center gap-8 p-4 mt-12">
-          <p className="text-xl font-semibold">
-            Connect your wallet to see if you are the{" "}
-            <span className="capitalize">{role(keyToFilterOn)}</span>
-          </p>
+        <Card className="flex flex-col items-center gap-8 p-4 mx-auto mt-12 w-fit">
+          {keyToFilterOn === "all_contracts" ? (
+            <p className="text-lg font-semibold">No contracts found</p>
+          ) : (
+            <p className="text-xl font-semibold">
+              Connect your wallet to see if you are the{" "}
+              <span className="capitalize">{role(keyToFilterOn)}</span>
+            </p>
+          )}
           <CustomConnectButton />
         </Card>
       )}

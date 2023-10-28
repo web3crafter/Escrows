@@ -2,6 +2,7 @@
 
 import { SpinnerButton } from "@/components/spinner-button"
 import { standardContractAbi } from "@/constants/abi/abis"
+import { useContractBalance } from "@/hooks/useContractBalance"
 import { useReleasedAmount } from "@/hooks/useReleasedAmount"
 import { useStandardAccountRoles } from "@/hooks/useStandardAccountRoles"
 import { useValidatedForms } from "@/hooks/useValidatedForms"
@@ -15,9 +16,11 @@ interface ApproveProps {
 }
 const Approve = ({ contractAddress, refetchIsApproved }: ApproveProps) => {
   const { isArbiter } = useStandardAccountRoles(contractAddress)
-  const { amountForm } = useValidatedForms()
   const { releasedAmount, refetch: refetchReleasedAmount } =
     useReleasedAmount(contractAddress)
+  const { contractBalance, refetch: refetchContractBalance } =
+    useContractBalance(contractAddress)
+
   const { data: approveResult, write: writeApprove } = useContractWrite({
     address: contractAddress as `0x${string}`,
     abi: standardContractAbi,
@@ -28,9 +31,9 @@ const Approve = ({ contractAddress, refetchIsApproved }: ApproveProps) => {
     hash: approveResult?.hash,
     confirmations: 1,
     onSuccess(data) {
+      toast.success(`${contractBalance} released to beneficiary`)
       refetchReleasedAmount()
-      // setDefaultAmount(formatEther(releasedAmount))
-      toast.success(`${formatEther(releasedAmount)} released to beneficiary`)
+      refetchContractBalance()
       refetchIsApproved()
     },
   })

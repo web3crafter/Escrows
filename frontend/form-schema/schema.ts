@@ -1,7 +1,6 @@
 import { isAddress } from "viem"
 import { z } from "zod"
 
-//TODO: amount: z.number
 export const validAddressSchema = z
   .string()
   .refine((value) => isAddress(value), "Invalid Ethereum Address")

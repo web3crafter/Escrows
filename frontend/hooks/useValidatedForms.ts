@@ -6,13 +6,10 @@ import {
   amountSchema,
 } from "@/form-schema/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 export const useValidatedForms = () => {
-  // const [defaultAmount, setDefaultAmount] = useState("")
-
   const amountForm = useForm<z.infer<typeof amountSchema>>({
     resolver: zodResolver(amountSchema),
     defaultValues: {
@@ -20,7 +17,6 @@ export const useValidatedForms = () => {
     },
   })
 
-  //TODO: change name to recipientForm
   const beneficiaryForm = useForm<z.infer<typeof addressSchema>>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
@@ -53,7 +49,6 @@ export const useValidatedForms = () => {
 
   return {
     amountForm,
-    // setDefaultAmount,
     beneficiaryForm,
     arbiterForm,
     managerForm,

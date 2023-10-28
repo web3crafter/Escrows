@@ -67,7 +67,6 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
     writeApprove?.({ args: [parseEther(amountForm.getValues("amount"))] })
   }
 
-  //TODO: Why is formattedRequestAmount bigint?
   const formattedRequestAmount = requestAmount && formatEther(requestAmount)
 
   return (

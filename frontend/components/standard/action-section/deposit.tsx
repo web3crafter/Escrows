@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { standardContractAbi } from "@/constants/abi/abis"
 import { amountSchema } from "@/form-schema/schema"
 import { useContractBalance } from "@/hooks/useContractBalance"
+import { useReleasedAmount } from "@/hooks/useReleasedAmount"
 import { useStandardAccountRoles } from "@/hooks/useStandardAccountRoles"
 import { useValidatedForms } from "@/hooks/useValidatedForms"
 import { toast } from "sonner"
@@ -25,12 +26,13 @@ interface DepositProps {
   contractAddress: string
   refetchIsApproved: () => void
 }
-//TODO: make releasedAmount in input, now it's defaultValues: {amount: ""} from amount form
+
 const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
-  const { refetch: refetchContractBalance } =
-    useContractBalance(contractAddress)
   const { isDeployer } = useStandardAccountRoles(contractAddress)
   const { amountForm } = useValidatedForms()
+  const { refetch: refetchContractBalance } =
+    useContractBalance(contractAddress)
+  const { refetch: refetchReleasedAmount } = useReleasedAmount(contractAddress)
 
   const { data: depositResult, write: writeDeposit } = useContractWrite({
     address: contractAddress as `0x${string}`,
@@ -43,8 +45,9 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
     confirmations: 1,
     onSuccess(data) {
       toast.success(`${amountForm.getValues("amount")} Deposited`)
-      refetchContractBalance()
       refetchIsApproved()
+      refetchReleasedAmount()
+      refetchContractBalance()
       amountForm.reset()
     },
   })

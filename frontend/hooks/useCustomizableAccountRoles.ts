@@ -3,7 +3,6 @@
 import { customizableContractAbi } from "@/constants/abi/abis"
 import { useAccount, useContractReads } from "wagmi"
 
-//TODO: Make change role status when role added
 export const useCustomizableAccountRoles = (contractAddress: string) => {
   // what do you need into this hook to be able to return what you want
   const { address: accountAddress } = useAccount()
