@@ -28,8 +28,6 @@ describe("CustomizableEscrow", function () {
     await customizableEscrow.waitForDeployment()
     await customizableEscrowWithDeposit.waitForDeployment()
 
-    // const deployer = await customizableEscrow.deployer()
-
     return {
       customizableEscrow,
       customizableEscrowWithDeposit,
@@ -139,10 +137,12 @@ describe("CustomizableEscrow", function () {
         const { customizableEscrow, deployer, arbiter } = await loadFixture(
           deployContractAndSetVariables
         )
-        await customizableEscrow.connect(deployer).addOwner(arbiter.address)
-        expect(await customizableEscrow.owners(arbiter.address)).to.eq(true)
-        await customizableEscrow.connect(deployer).removeOwner(arbiter.address)
-        expect(await customizableEscrow.owners(arbiter.address)).to.eq(false)
+        await customizableEscrow.connect(deployer).addManager(arbiter.address)
+        expect(await customizableEscrow.managers(arbiter.address)).to.eq(true)
+        await customizableEscrow
+          .connect(deployer)
+          .removeManager(arbiter.address)
+        expect(await customizableEscrow.managers(arbiter.address)).to.eq(false)
       })
 
       it("Should be reverted if caller is not deployer", async () => {
@@ -150,15 +150,11 @@ describe("CustomizableEscrow", function () {
           deployContractAndSetVariables
         )
         await expect(
-          customizableEscrow.connect(arbiter).addOwner(arbiter.address)
-        ).to.be.revertedWith(
-          "Only the contract deployer can perform this action"
-        )
+          customizableEscrow.connect(arbiter).addManager(arbiter.address)
+        ).to.be.revertedWith("Caller not deployer")
         await expect(
-          customizableEscrow.connect(arbiter).removeOwner(arbiter.address)
-        ).to.be.revertedWith(
-          "Only the contract deployer can perform this action"
-        )
+          customizableEscrow.connect(arbiter).removeManager(arbiter.address)
+        ).to.be.revertedWith("Caller not deployer")
       })
     })
 
@@ -183,7 +179,9 @@ describe("CustomizableEscrow", function () {
 
         const tempArbiter = arbiter
         //Deployer makes arbiter owner
-        await customizableEscrow.connect(deployer).addOwner(tempArbiter.address)
+        await customizableEscrow
+          .connect(deployer)
+          .addManager(tempArbiter.address)
 
         //Owner adds addr2 to arbiters
         await customizableEscrow.connect(tempArbiter).addArbiter(addr2.address)
@@ -202,11 +200,11 @@ describe("CustomizableEscrow", function () {
 
         await expect(
           customizableEscrow.connect(addr1).addArbiter(addr2.address)
-        ).to.be.revertedWith("Caller must be Deployer or Owner")
+        ).to.be.revertedWith("Caller must be Deployer or manager")
 
         await expect(
           customizableEscrow.connect(addr1).removeArbiter(addr2.address)
-        ).to.be.revertedWith("Caller must be Deployer or Owner")
+        ).to.be.revertedWith("Caller must be Deployer or manager")
       })
     })
   })
@@ -241,17 +239,6 @@ describe("CustomizableEscrow", function () {
         depositAmount
       )
     })
-
-    it("Should update requests", async () => {
-      const { customizableEscrowWithDeposit, beneficiary, depositAmount } =
-        await loadFixture(deployContractAndSetVariables)
-      await customizableEscrowWithDeposit
-        .connect(beneficiary)
-        .requestReleaseAmount(depositAmount)
-      expect(
-        await customizableEscrowWithDeposit.requests(beneficiary.address)
-      ).to.eq(depositAmount)
-    })
   })
 
   describe("Approve", function () {
@@ -276,7 +263,7 @@ describe("CustomizableEscrow", function () {
 
       await customizableEscrowWithDeposit
         .connect(arbiter)
-        .approveRequestAmount()
+        .approveRequestAmount(depositAmount)
 
       const beneficiaryBalanceAfter = await ethers.provider.getBalance(
         beneficiary.address
@@ -301,8 +288,8 @@ describe("CustomizableEscrow", function () {
       await expect(
         customizableEscrowWithDeposit
           .connect(beneficiary)
-          .approveRequestAmount()
-      ).to.be.revertedWith("Only the arbiters can perform this action")
+          .approveRequestAmount(depositAmount)
+      ).to.be.revertedWith("Caller not arbiter")
     })
 
     it("Should update totalReleasedAmount", async () => {
@@ -324,7 +311,7 @@ describe("CustomizableEscrow", function () {
 
       await customizableEscrowWithDeposit
         .connect(arbiter)
-        .approveRequestAmount()
+        .approveRequestAmount(depositAmount)
 
       const totalReleasedAmountAfter =
         await customizableEscrowWithDeposit.totalReleasedAmount()
@@ -350,7 +337,7 @@ describe("CustomizableEscrow", function () {
 
       await customizableEscrowWithDeposit
         .connect(arbiter)
-        .approveRequestAmount()
+        .approveRequestAmount(depositAmount)
 
       expect(await customizableEscrowWithDeposit.approvals(arbiter)).to.eq(
         requestAmount
@@ -369,7 +356,7 @@ describe("CustomizableEscrow", function () {
 
       await expect(
         customizableEscrowWithDeposit.connect(beneficiary).rejectRequestAmount()
-      ).to.be.revertedWith("Caller must be Deployer, owner or arbiter")
+      ).to.be.revertedWith("Caller must be Deployer, manager or arbiter")
     })
 
     it("Should reset requestAmount", async () => {
