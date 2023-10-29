@@ -1,5 +1,4 @@
 import {
-  IEscrow,
   RetrievedCustomizableInfoFromSmartContract,
   RetrievedStandardInfoFromSmartContract,
 } from "@/types/types"

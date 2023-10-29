@@ -23,11 +23,12 @@ export const HeroSection = () => {
           </h1>
         </div>
 
-        <p className="mt-2 text-center sm:text-lg md:text-left">
+        <p className="mt-2 text-center leading-7 text-xl sm:text-2xl md:text-xl lg:text-2xl md:text-left">
           Are you in need of a secure and customizable way to handle financial
           transactions, agreements, or deals? Look no further! With Web3Crafter
-          Escrows, you have the power to create and manage your very own escrow
-          contracts, tailored to your unique needs.
+          Escrows, you have the power to create, and manage your very own escrow
+          contracts. Deployed on the Sepolia test network, tailored to your
+          unique needs.
         </p>
         <CallToActionButton className="text-base bg-gradient-to-r from-violet-950 to-accent dark:from-violet-950 dark:to-accent" />
       </div>
