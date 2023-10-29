@@ -37,7 +37,11 @@ const wagmiConfig = createConfig({
   publicClient,
 })
 
-export function RainbowProviders({ children }: { children: React.ReactNode }) {
+export function WagmiRainbowProviders({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
