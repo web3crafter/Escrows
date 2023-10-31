@@ -9,7 +9,7 @@ const Logo = () => {
       </div>
       <div className="flex flex-col items-center text-lg font-bold text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-clip-text">
         <p className="">Web3Crafter</p>
-        <p className="">Escrow</p>
+        <p className="">Escrows</p>
       </div>
     </Link>
   )

@@ -17,8 +17,8 @@ export const CallToAction = ({ className }: { className?: string }) => {
       </h3>
       <p className="text-xl sm:text-lg">
         Empower yourself with the ability to create escrow contracts that match
-        your unique requirements. Join Web3Crafter Escrow now and experience the
-        future of secure and customizable financial agreements.
+        your unique requirements. Join Web3Crafter Escrows now and experience
+        the future of secure and customizable financial agreements.
       </p>
       <CallToActionButton className="bg-gradient-to-r from-violet-950 to-accent dark:from-violet-900 dark:to-accent" />
     </div>

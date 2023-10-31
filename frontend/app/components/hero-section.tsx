@@ -16,7 +16,7 @@ export const HeroSection = () => {
             <span className="text-transparent bg-gradient-to-tr from-primary via-accent to-primary bg-clip-text">
               Web3Crafter
             </span>{" "}
-            Escrow
+            Escrows
           </h2>
           <h1 className="text-3xl font-extrabold tracking-tight text-center md:text-left sm:text-4xl scroll-m-20 lg:text-5xl">
             Your Escrow Contract Creator
