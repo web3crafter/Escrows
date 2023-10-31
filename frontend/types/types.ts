@@ -40,9 +40,6 @@ export type EscrowType = "standard" | "customizable"
 
 export type MappingType = "deposits" | "approvals"
 
-/**
- * Represents the result of a Promise that can either be fulfilled with a value or rejected with a reason.
- */
 export type PromiseResult<T> =
   | {
       status: "fulfilled"
@@ -60,3 +57,10 @@ export type FilterKey =
   | "arbiter"
   | "arbiters"
   | "managers"
+
+export type ConfirmationButtonText =
+  | "Waiting for confirmation"
+  | "Transaction pending"
+  | "Deploy"
+  | "Approve"
+  | "Deposit"

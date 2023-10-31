@@ -25,7 +25,7 @@ const RequestETHAmount = ({ contractAddress }: RequestProps) => {
 
   const [open, setOpen] = useState(false)
   const { isBeneficiary } = useCustomizableAccountRoles(contractAddress)
-  const { refetch } = useRequestAmount(contractAddress)
+  const { refetch: refetchRequestAmount } = useRequestAmount(contractAddress)
   const { data: contractBalance } = useContractBalance(contractAddress)
 
   const { data: requestResult, write: writeRequest } = useContractWrite({
@@ -38,8 +38,10 @@ const RequestETHAmount = ({ contractAddress }: RequestProps) => {
     hash: requestResult?.hash,
     confirmations: 1,
     onSuccess(txReceipt) {
-      refetch()
-      handleModalState(amountForm, open, setOpen)
+      refetchRequestAmount()
+      if (open) {
+        handleModalState(amountForm, open, setOpen)
+      }
       revalidatePagePath(`/contract/customizable/${contractAddress}`)
       console.log("Request Success")
     },

@@ -1,6 +1,5 @@
 "use client"
 
-import ETHLogo from "@/components/eth-logo"
 import { SpinnerButton } from "@/components/spinner-button"
 import {
   Form,
@@ -11,14 +10,17 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import Web3Button from "@/components/web-3-button"
 import { standardContractAbi } from "@/constants/abi/abis"
 import { amountSchema } from "@/form-schema/schema"
 import { useContractBalance } from "@/hooks/useContractBalance"
 import { useReleasedAmount } from "@/hooks/useReleasedAmount"
 import { useStandardAccountRoles } from "@/hooks/useStandardAccountRoles"
 import { useValidatedForms } from "@/hooks/useValidatedForms"
+import { ConfirmationButtonText } from "@/types/types"
+import { useState } from "react"
 import { toast } from "sonner"
-import { parseEther } from "viem"
+import { UserRejectedRequestError, parseEther } from "viem"
 import { useContractWrite, useWaitForTransaction } from "wagmi"
 import { z } from "zod"
 
@@ -27,9 +29,13 @@ interface DepositProps {
   refetchIsApproved: () => void
 }
 
+//TODO: Fix layout change on input when waiting for confirmation
 const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
   const { isDeployer } = useStandardAccountRoles(contractAddress)
   const { amountForm } = useValidatedForms()
+  const [txValue, setTXValue] = useState<bigint>(BigInt(0))
+  const [confirmationButtonText, setConfirmationButtonText] =
+    useState<ConfirmationButtonText>("Deposit")
   const { refetch: refetchContractBalance } =
     useContractBalance(contractAddress)
   const { refetch: refetchReleasedAmount } = useReleasedAmount(contractAddress)
@@ -38,6 +44,14 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
     address: contractAddress as `0x${string}`,
     abi: standardContractAbi,
     functionName: "deposit",
+    onSuccess: () => setConfirmationButtonText("Transaction pending"),
+    onError: (e) => {
+      const error = e as UserRejectedRequestError
+      if (error.shortMessage === "User rejected the request.") {
+        setConfirmationButtonText("Deposit")
+        toast.error("Transaction canceled")
+      }
+    },
   })
 
   const { status: depositedStatus } = useWaitForTransaction({
@@ -53,12 +67,25 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
   })
 
   const handleDeposit = (depositAmount: z.infer<typeof amountSchema>) => {
+    setConfirmationButtonText("Waiting for confirmation")
     if (!isDeployer) {
       toast.error("Only the deployer of the contract can deposit funds")
     }
     writeDeposit?.({
       value: parseEther(depositAmount.amount),
     })
+  }
+
+  // const handleDeposit = (depositAmount: z.infer<typeof amountSchema>) => {
+  //   setTXValue(parseEther(depositAmount.amount))
+  // }
+
+  const onSuccess = () => {
+    toast.success(`${amountForm.getValues("amount")} Deposited`)
+    refetchIsApproved()
+    refetchReleasedAmount()
+    refetchContractBalance()
+    amountForm.reset()
   }
   return (
     <Form {...amountForm}>
@@ -85,8 +112,23 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
                     amountForm.getValues("amount") === "0"
                   }
                 >
-                  Deposit
+                  {confirmationButtonText}
                 </SpinnerButton>
+                {/* <Web3Button
+                  buttonLabel="Deposit"
+                  buttonType="submit"
+                  variant={"gradient"}
+                  contractAddress={contractAddress}
+                  contractAbi={standardContractAbi}
+                  functionName="deposit"
+                  txValue={txValue}
+                  onSuccess={onSuccess}
+                  isDisabled={
+                    !isDeployer ||
+                    amountForm.getValues("amount") === "" ||
+                    amountForm.getValues("amount") === "0"
+                  }
+                /> */}
               </div>
             </FormItem>
           )}

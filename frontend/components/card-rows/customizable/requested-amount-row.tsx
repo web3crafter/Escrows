@@ -18,7 +18,7 @@ const RequestedAmountRow = ({
           {`${requestedAmount && formatEther(requestedAmount)}`}
           <ETHLogo />
         </div>
-        currently waiting for approval
+        waiting for approval
       </div>
     </div>
   )

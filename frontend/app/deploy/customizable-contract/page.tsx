@@ -2,7 +2,10 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { TransactionReceiptNotFoundErrorType } from "viem"
+import {
+  TransactionReceiptNotFoundErrorType,
+  UserRejectedRequestError,
+} from "viem"
 import { toast } from "sonner"
 
 import { useAccount, useWaitForTransaction, useWalletClient } from "wagmi"
@@ -12,13 +15,13 @@ import CustomizableEscrow from "@/artifacts/contracts/CustomizableEscrow.sol/Cus
 import { customizableContractAbi } from "@/constants/abi/abis"
 import { storeCustomizableContractAddress } from "@/action/db/store-contract-address"
 import { revalidatePagePath } from "@/action/revalidate-path"
-import { ContractCreation } from "@/types/types"
+import { ConfirmationButtonText, ContractCreation } from "@/types/types"
 
 import { OverviewCard } from "@/app/deploy/customizable-contract/components/overview-card"
 import { CreateCard } from "@/app/deploy/customizable-contract/components/create-card"
 
+//TODO: Fix when metamask is canceled
 const AdvancedContractPage = () => {
-  const [isInteracting, setIsInteracting] = useState(false)
   const [contract, setContract] = useState<ContractCreation>({
     arbiters: [],
     managers: [],
@@ -28,18 +31,18 @@ const AdvancedContractPage = () => {
   const [transactionHash, setTransactionHash] = useState<
     `0x${string}` | undefined
   >()
+  const [confirmationButtonText, setConfirmationButtonText] =
+    useState<ConfirmationButtonText>("Deploy")
   const { isConnected, address: accountAddress } = useAccount()
   const isMounted = useIsMounted()
   const router = useRouter()
   const { data: walletClient } = useWalletClient()
-  const { data } = useWaitForTransaction({
+  const { status: deploymentStatus } = useWaitForTransaction({
     hash: transactionHash,
     confirmations: 1,
     async onSuccess(data) {
       const contractAddress = data.contractAddress
       if (contractAddress) {
-        console.log("contractAddress:", contractAddress)
-
         const depositsArr =
           contract.amount === "" || contract.amount === "0"
             ? []
@@ -53,10 +56,9 @@ const AdvancedContractPage = () => {
           requests: [],
           approvals: [],
         }
-
         await storeCustomizableContractAddress(objToStore)
 
-        toast("Contract Deployed", {
+        toast.success("Contract Deployed", {
           description: `Contract Address: ${contractAddress}`,
         })
 
@@ -66,37 +68,50 @@ const AdvancedContractPage = () => {
           managers: [],
           amount: "",
         })
-        setIsInteracting(false)
         await revalidatePagePath("/contracts")
         router.push(`/contract/customizable/${contractAddress}`)
-        console.log("escrowContract:", contractAddress)
+        setConfirmationButtonText("Deploy")
       }
     },
     onError(e) {
-      setIsInteracting(false)
-
       const error = e as TransactionReceiptNotFoundErrorType
       console.log("error:", error)
+      setConfirmationButtonText("Deploy")
+
+      toast.error(
+        <div className="flex flex-col bg-red-500">
+          <p>Error</p>
+          <p>{error.shortMessage}</p>
+        </div>
+      )
     },
   })
 
   const deployContract = async () => {
-    setIsInteracting(true)
+    setConfirmationButtonText("Waiting for confirmation")
+    try {
+      if (!isConnected) return console.log("Not Connected")
 
-    if (!isConnected) return console.log("Not Connected")
-
-    const escrowContract = await walletClient?.deployContract({
-      abi: customizableContractAbi,
-      account: accountAddress,
-      args: [
-        contract.arbiters as `0x${string}`[],
-        contract.managers as `0x${string}`[],
-        contract.beneficiary as `0x${string}`,
-      ],
-      bytecode: CustomizableEscrow.bytecode as `0x${string}`,
-      value: BigInt(contract.amount),
-    })
-    setTransactionHash(escrowContract)
+      const escrowContract = await walletClient?.deployContract({
+        abi: customizableContractAbi,
+        account: accountAddress,
+        args: [
+          contract.arbiters as `0x${string}`[],
+          contract.managers as `0x${string}`[],
+          contract.beneficiary as `0x${string}`,
+        ],
+        bytecode: CustomizableEscrow.bytecode as `0x${string}`,
+        value: BigInt(contract.amount),
+      })
+      setTransactionHash(escrowContract)
+      setConfirmationButtonText("Transaction pending")
+    } catch (e) {
+      const error = e as UserRejectedRequestError
+      if (error.shortMessage === "User rejected the request.") {
+        setConfirmationButtonText("Deploy")
+        toast.error("Transaction canceled")
+      }
+    }
   }
 
   if (!isMounted) return null
@@ -111,8 +126,9 @@ const AdvancedContractPage = () => {
       <OverviewCard
         contract={contract}
         setContract={setContract}
-        isInteracting={isInteracting}
+        deploymentStatus={deploymentStatus}
         deployContract={deployContract}
+        confirmationButtonText={confirmationButtonText}
         className="w-full px-2 sm:px-8 md:w-fit"
       />
     </div>

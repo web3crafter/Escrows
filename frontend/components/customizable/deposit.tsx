@@ -43,7 +43,9 @@ const Deposit = ({ contractAddress }: DepositProps) => {
       onSuccess(data) {
         updateDeposits(contractAddress, accountAddress as string)
         refetchContractBalance()
-        handleModalState(amountForm, open, setOpen)
+        if (open) {
+          handleModalState(amountForm, open, setOpen)
+        }
         revalidatePagePath(`/contract/customizable/${contractAddress}`)
         console.log("Deposit Success")
       },

@@ -1,5 +1,9 @@
 "use client"
-import { TransactionReceiptNotFoundErrorType, parseEther } from "viem"
+import {
+  TransactionReceiptNotFoundErrorType,
+  UserRejectedRequestError,
+  parseEther,
+} from "viem"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import * as z from "zod"
@@ -27,7 +31,9 @@ import {
   useWalletClient,
 } from "wagmi"
 import DeployStandardFormField from "@/app/deploy/standard-contract/components/deploy-standard-form-field"
+import { ConfirmationButtonText } from "@/types/types"
 
+//TODO: Fix waiting for confirmation on cancel metamask
 const StandardContractPage = () => {
   const isMounted = useIsMounted()
   const router = useRouter()
@@ -39,57 +45,70 @@ const StandardContractPage = () => {
     chainId: sepolia.id,
   })
 
+  const [confirmationButtonText, setConfirmationButtonText] =
+    useState<ConfirmationButtonText>("Deploy")
+
   const { createStandardContractForm } = useValidatedForms()
 
-  const { data: deployedContract, status: deploymentStatus } =
-    useWaitForTransaction({
-      hash: transactionHash,
-      confirmations: 1,
-      async onSuccess(data) {
-        const contractAddress = data.contractAddress
-        if (contractAddress) {
-          await storeContractAddress(contractAddress)
+  const { status: deploymentStatus } = useWaitForTransaction({
+    hash: transactionHash,
+    confirmations: 1,
+    async onSuccess(data) {
+      const contractAddress = data.contractAddress
+      if (contractAddress) {
+        await storeContractAddress(contractAddress)
 
-          toast.message("Escrow Contract Deployed", {
-            description: `Contract Address: ${contractAddress}`,
-          })
+        toast.success("Escrow Contract Deployed", {
+          description: `Contract Address: ${contractAddress}`,
+        })
 
-          createStandardContractForm.reset()
-          await revalidatePagePath("/contracts")
-          router.push(`/contract/standard/${contractAddress}`)
-        }
-      },
-      onError(e) {
-        const error = e as TransactionReceiptNotFoundErrorType
-        console.log("error:", error.shortMessage)
+        createStandardContractForm.reset()
+        await revalidatePagePath("/contracts")
+        router.push(`/contract/standard/${contractAddress}`)
+        setConfirmationButtonText("Deploy")
+      }
+    },
+    onError(e) {
+      const error = e as TransactionReceiptNotFoundErrorType
+      console.log("error:", error.shortMessage)
+      setConfirmationButtonText("Deploy")
 
-        toast.error(
-          <div className="flex flex-col bg-red-500">
-            <p>Error</p>
-            <p>{error.shortMessage}</p>
-          </div>
-        )
-      },
-    })
+      toast.error(
+        <div className="flex flex-col bg-red-500">
+          <p>Error</p>
+          <p>{error.shortMessage}</p>
+        </div>
+      )
+    },
+  })
 
   const onSubmit = async (
     values: z.infer<typeof CreateStandardContractSchema>
   ) => {
-    if (!isConnected) return console.log("Not Connected")
+    setConfirmationButtonText("Waiting for confirmation")
+    try {
+      if (!isConnected) return console.log("Not Connected")
 
-    const arbiter = values.arbiterAddress
-    const beneficiary = values.beneficiaryAddress
-    const amount = parseEther(values.amount)
+      const arbiter = values.arbiterAddress
+      const beneficiary = values.beneficiaryAddress
+      const amount = parseEther(values.amount)
 
-    const escrowContract = await walletClient?.deployContract({
-      abi: standardContractAbi,
-      account: address,
-      args: [arbiter as `0x${string}`, beneficiary as `0x${string}`],
-      bytecode: Escrow.bytecode as `0x${string}`,
-      value: amount,
-    })
-
-    setTransactionHash(escrowContract)
+      const escrowContract = await walletClient?.deployContract({
+        abi: standardContractAbi,
+        account: address,
+        args: [arbiter as `0x${string}`, beneficiary as `0x${string}`],
+        bytecode: Escrow.bytecode as `0x${string}`,
+        value: amount,
+      })
+      setTransactionHash(escrowContract)
+      setConfirmationButtonText("Transaction pending")
+    } catch (e) {
+      const error = e as UserRejectedRequestError
+      if (error.shortMessage === "User rejected the request.") {
+        setConfirmationButtonText("Deploy")
+        toast.error("Transaction canceled")
+      }
+    }
   }
 
   if (!isMounted) {
@@ -140,11 +159,19 @@ const StandardContractPage = () => {
               {isConnected ? (
                 <SpinnerButton
                   type="submit"
-                  disabled={deploymentStatus === "loading"}
+                  disabled={
+                    deploymentStatus === "loading" ||
+                    createStandardContractForm.getValues(
+                      "beneficiaryAddress"
+                    ) === "" ||
+                    createStandardContractForm.getValues("arbiterAddress") ===
+                      "" ||
+                    createStandardContractForm.getValues("amount") === ""
+                  }
                   loading={deploymentStatus === "loading"}
                   className="w-full mt-5 sm:w-fit bg-gradient-to-r from-primary to-accent hover:bg-primary"
                 >
-                  Deploy
+                  {confirmationButtonText}
                 </SpinnerButton>
               ) : (
                 <CustomConnectButton />

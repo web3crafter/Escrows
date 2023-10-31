@@ -8,6 +8,8 @@ import ArbiterSection from "@/components/standard/arbiter-section"
 import BeneficiarySection from "@/components/standard/beneficiary-section"
 import ContractNotFound from "@/app/contract/components/contract-not-found"
 import { validateAddressWithZod } from "@/lib/utils"
+import Web3Button from "@/components/web-3-button"
+import { standardContractAbi } from "@/constants/abi/abis"
 
 export const dynamic = "force-dynamic"
 

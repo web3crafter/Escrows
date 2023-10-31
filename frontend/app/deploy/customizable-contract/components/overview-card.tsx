@@ -1,9 +1,9 @@
 "use client"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 
 import { useIsMounted } from "@/hooks/useIsMounted"
 
-import { ContractCreation } from "@/types/types"
+import { ConfirmationButtonText, ContractCreation } from "@/types/types"
 import { SpinnerButton } from "@/components/spinner-button"
 import { Card, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -13,11 +13,13 @@ import ManagersOverviewSection from "@/app/deploy/customizable-contract/componen
 import AmountOverviewSection from "@/app/deploy/customizable-contract/components/overview/amount-overview-section"
 import { useAccount } from "wagmi"
 import CustomConnectButton from "@/components/custom-connect-button"
+import Web3Button from "@/components/web-3-button"
 
 interface OverviewCardProps {
   contract: ContractCreation
   setContract: Dispatch<SetStateAction<ContractCreation>>
-  isInteracting: boolean
+  deploymentStatus: "error" | "idle" | "success" | "loading"
+  confirmationButtonText: ConfirmationButtonText
   deployContract: () => Promise<void>
   className?: string
 }
@@ -25,9 +27,10 @@ interface OverviewCardProps {
 export const OverviewCard: React.FC<OverviewCardProps> = ({
   contract,
   setContract,
-  isInteracting,
   deployContract,
   className,
+  deploymentStatus,
+  confirmationButtonText,
 }) => {
   const isMounted = useIsMounted()
   const { isConnected } = useAccount()
@@ -99,14 +102,16 @@ export const OverviewCard: React.FC<OverviewCardProps> = ({
       {isConnected ? (
         <SpinnerButton
           disabled={
-            isInteracting || beneficiary === "" || arbiters.length === 0
+            deploymentStatus === "loading" ||
+            beneficiary === "" ||
+            arbiters.length === 0
           }
-          loading={isInteracting}
+          loading={deploymentStatus === "loading"}
           className="w-full "
           onClick={deployContract}
           variant={"gradient"}
         >
-          Deploy
+          {confirmationButtonText}
         </SpinnerButton>
       ) : (
         <CustomConnectButton />

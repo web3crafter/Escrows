@@ -2,6 +2,7 @@
 import Approve from "@/components/standard/action-section/approve"
 import Deposit from "@/components/standard/action-section/deposit"
 import { Button } from "@/components/ui/button"
+import Web3Button from "@/components/web-3-button"
 import { useIsApproved } from "@/hooks/useIsApproved"
 import { useStandardAccountRoles } from "@/hooks/useStandardAccountRoles"
 
@@ -29,7 +30,7 @@ const ActionSection = ({ contractAddress }: ActionSectionProps) => {
         />
       ) : (
         <Button
-          className="w-full text-lg text-center text-orange-700"
+          className="w-full text-lg text-center text-orange-700 hover:bg-inherit"
           variant={"ghost"}
         >
           Waiting for arbiter to approve

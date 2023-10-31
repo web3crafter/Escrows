@@ -57,7 +57,9 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
       refetchTotalReleasedAmount()
       refetchBeneficiaryBalance()
       refetchRequestAmount()
-      handleModalState(amountForm, open, setOpen)
+      if (open) {
+        handleModalState(amountForm, open, setOpen)
+      }
       revalidatePagePath(`/contract/customizable/${contractAddress}`)
       console.log("Approved Success")
     },

@@ -1,6 +1,6 @@
 import { Button, ButtonProps } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { IoReloadSharp } from "react-icons/io5"
+import { Loader2 } from "lucide-react"
 
 /**
  * Props for the SpinnerButton component.
@@ -30,7 +30,10 @@ const SpinnerButton: React.FC<SpinnerButtonProps> = ({
       {...props}
     >
       {loading ? (
-        <IoReloadSharp className="w-7 h-7 animate-spin" />
+        <div className="flex items-center gap-2">
+          {children}
+          <Loader2 className="w-7 h-7 animate-spin" />
+        </div>
       ) : (
         <span>{children}</span>
       )}
