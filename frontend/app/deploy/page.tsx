@@ -82,6 +82,7 @@ const CreateContractPage = () => {
           href={escrowTypes.simple.href}
           className="md:flex-1"
           deployPage={true}
+          callToActionClassName="text-base"
         />
         <div>
           <Separator orientation="vertical" className="hidden md:block" />
@@ -93,6 +94,7 @@ const CreateContractPage = () => {
           href={escrowTypes.advanced.href}
           className="md:flex-1"
           deployPage={true}
+          callToActionClassName="text-base"
         />
       </div>
     </main>

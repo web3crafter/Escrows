@@ -92,7 +92,7 @@ export const CreateCard: React.FC<CreateCardProps> = ({
               addressForm={arbiterForm}
               addAction={addArbiter}
               label="Arbiters of this contract"
-              optionalOrRequiredLabel="one or more required"
+              optionalOrRequiredLabel="required, one or more"
               className="lg:flex-1"
             />
           </div>
@@ -101,7 +101,7 @@ export const CreateCard: React.FC<CreateCardProps> = ({
               addressForm={managerForm}
               addAction={addManager}
               label="Managers of this contract"
-              optionalOrRequiredLabel="one or more optional"
+              optionalOrRequiredLabel="optional, one or more"
               className="lg:flex-1"
             />
 
