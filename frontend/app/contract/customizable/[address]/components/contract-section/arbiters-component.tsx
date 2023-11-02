@@ -1,6 +1,6 @@
 "use client"
 import { z } from "zod"
-import { decodeEventLog } from "viem"
+import { UserRejectedRequestError, decodeEventLog } from "viem"
 import { useState } from "react"
 
 import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi"
@@ -21,6 +21,7 @@ import ConfirmMessageAndButtons from "@/app/contract/customizable/[address]/comp
 import ConfirmAddressField from "@/components/input-form-fields/confirm-modal-fields/confirm-address-field"
 import { toast } from "sonner"
 import { useValidatedForms } from "@/hooks/useValidatedForms"
+import { ConfirmationButtonText } from "@/types/types"
 
 interface ArbitersComponentProps {
   contractAddress: `0x${string}`
@@ -34,75 +35,95 @@ const ArbitersComponent: React.FC<ArbitersComponentProps> = ({
 
   const [open, setOpen] = useState(false)
   const [openRemoveArbiter, setOpenRemoveArbiter] = useState(false)
-  const { address: accountAddress, isConnected } = useAccount()
 
   const { isDeployer, isManager } = useCustomizableAccountRoles(contractAddress)
+  const [confirmationButtonText, setConfirmationButtonText] =
+    useState<ConfirmationButtonText>("confirm")
 
   const { data: addArbiterResult, write: WriteAddArbiter } = useContractWrite({
     address: contractAddress,
     abi: customizableContractAbi,
     functionName: "addArbiter",
+    onSuccess: () => setConfirmationButtonText("Transaction pending"),
+    onError: (e) => {
+      const error = e as UserRejectedRequestError
+      if (error.shortMessage === "User rejected the request.") {
+        setConfirmationButtonText("confirm")
+        toast.error("Transaction canceled")
+      }
+    },
   })
-  const { data: addArbiterReceipt, status: addedArbiterStatus } =
-    useWaitForTransaction({
-      hash: addArbiterResult?.hash,
-      confirmations: 1,
-      onSuccess(txReceipt) {
-        const addArbiterEvent = decodeEventLog({
-          abi: customizableContractAbi,
-          eventName: "AddedArbiter",
-          topics: txReceipt.logs[0].topics,
-        })
-        const arbiterToAdd = addArbiterEvent.args.arbiterAdded
-        if (txReceipt.status === "success") {
-          if (!arbiters.includes(arbiterToAdd)) {
-            updateArbiters(contractAddress, arbiterToAdd, "add")
+  const { status: addedArbiterStatus } = useWaitForTransaction({
+    hash: addArbiterResult?.hash,
+    confirmations: 1,
+    onSuccess(txReceipt) {
+      const addArbiterEvent = decodeEventLog({
+        abi: customizableContractAbi,
+        eventName: "AddedArbiter",
+        topics: txReceipt.logs[0].topics,
+      })
+      const arbiterToAdd = addArbiterEvent.args.arbiterAdded
+      if (txReceipt.status === "success") {
+        if (!arbiters.includes(arbiterToAdd)) {
+          updateArbiters(contractAddress, arbiterToAdd, "add")
+          setConfirmationButtonText("confirm")
+          if (open) {
             handleModalState(arbiterForm, open, setOpen)
-            revalidatePagePath(`/contract/customizable/${contractAddress}`)
-            toast.success("Added Arbiter Success")
-          } else {
-            toast("Arbiter already in db")
           }
+          revalidatePagePath(`/contract/customizable/${contractAddress}`)
+          toast.success("Added Arbiter Success")
         } else {
-          toast.error("Transaction reverted")
+          toast("Arbiter already in db")
         }
-      },
-    })
+      } else {
+        toast.error("Transaction reverted")
+      }
+    },
+  })
 
   const { data: removeArbiterResult, write: WriteRemoveArbiter } =
     useContractWrite({
       address: contractAddress,
       abi: customizableContractAbi,
       functionName: "removeArbiter",
-    })
-  const { data: removedArbiterReceipt, status: removedArbiterStatus } =
-    useWaitForTransaction({
-      hash: removeArbiterResult?.hash,
-      confirmations: 1,
-      onSuccess(txReceipt) {
-        const removedArbiterEvent = decodeEventLog({
-          abi: customizableContractAbi,
-          eventName: "RemovedArbiter",
-          topics: txReceipt.logs[0].topics,
-        })
-        const arbiterToRemove = removedArbiterEvent.args.arbiterRemoved
-        if (txReceipt.status === "success") {
-          if (arbiters.includes(arbiterToRemove)) {
-            updateArbiters(contractAddress, arbiterToRemove, "remove")
-            setOpenRemoveArbiter(false)
-            revalidatePagePath(`/contract/customizable/${contractAddress}`)
-            toast.success("Removed Arbiter Success")
-          } else {
-            toast.error("Added Arbiter Failed")
-          }
+      onSuccess: () => setConfirmationButtonText("Transaction pending"),
+      onError: (e) => {
+        const error = e as UserRejectedRequestError
+        if (error.shortMessage === "User rejected the request.") {
+          setConfirmationButtonText("confirm")
+          toast.error("Transaction canceled")
         }
       },
     })
+  const { status: removedArbiterStatus } = useWaitForTransaction({
+    hash: removeArbiterResult?.hash,
+    confirmations: 1,
+    onSuccess(txReceipt) {
+      const removedArbiterEvent = decodeEventLog({
+        abi: customizableContractAbi,
+        eventName: "RemovedArbiter",
+        topics: txReceipt.logs[0].topics,
+      })
+      const arbiterToRemove = removedArbiterEvent.args.arbiterRemoved
+      if (txReceipt.status === "success") {
+        if (arbiters.includes(arbiterToRemove)) {
+          updateArbiters(contractAddress, arbiterToRemove, "remove")
+          setConfirmationButtonText("confirm")
+          setOpenRemoveArbiter(false)
+          revalidatePagePath(`/contract/customizable/${contractAddress}`)
+          toast.success("Removed Arbiter Success")
+        } else {
+          toast.error("Added Arbiter Failed")
+        }
+      }
+    },
+  })
 
   const addArbiter = async (value: z.infer<typeof addressSchema>) => {
     if (!isDeployer && !isManager) {
       toast.error("Only the deployer or manager can add arbiters")
     }
+    setConfirmationButtonText("Waiting for confirmation")
     WriteAddArbiter({
       args: [value.address as `0x${string}`],
     })
@@ -112,6 +133,7 @@ const ArbitersComponent: React.FC<ArbitersComponentProps> = ({
     if (!isDeployer && !isManager) {
       toast("Only the deployer or manager can remove arbiters")
     }
+    setConfirmationButtonText("Waiting for confirmation")
     WriteRemoveArbiter({
       args: [arbiter as `0x${string}`],
     })
@@ -159,6 +181,7 @@ const ArbitersComponent: React.FC<ArbitersComponentProps> = ({
               confirmAction={addArbiter}
               loading={addedArbiterStatus === "loading"}
               setOpen={setOpen}
+              buttonLabel={confirmationButtonText}
             />
           </ConfirmModal>
         )}
@@ -192,6 +215,7 @@ const ArbitersComponent: React.FC<ArbitersComponentProps> = ({
                 confirmAction={() => removeArbiter(arbiter)}
                 disabled={removedArbiterStatus === "loading"}
                 loading={removedArbiterStatus === "loading"}
+                confirmButtonLabel={confirmationButtonText}
               />
             </ConfirmModal>
           )}

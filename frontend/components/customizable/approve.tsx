@@ -1,5 +1,5 @@
 "use client"
-import { formatEther, parseEther } from "viem"
+import { UserRejectedRequestError, formatEther, parseEther } from "viem"
 import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi"
 
 import { updateApprovals } from "@/action/db/customizable/approvals"
@@ -18,6 +18,8 @@ import { useBeneficiaryBalance } from "@/hooks/useBeneficiaryBalance"
 import ConfirmAmountField from "@/components/input-form-fields/confirm-modal-fields/confirm-amount-field"
 import { handleModalState } from "@/lib/utils"
 import { useValidatedForms } from "@/hooks/useValidatedForms"
+import { ConfirmationButtonText } from "@/types/types"
+import { toast } from "sonner"
 
 interface ApproveProps {
   contractAddress: `0x${string}`
@@ -29,6 +31,8 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
   const { amountForm } = useValidatedForms()
   const { isArbiter } = useCustomizableAccountRoles(contractAddress)
   const { address: accountAddress } = useAccount()
+  const [confirmationButtonText, setConfirmationButtonText] =
+    useState<ConfirmationButtonText>("Approve")
 
   const { contractBalance, refetch: refetchContractBalance } =
     useContractBalance(contractAddress)
@@ -46,12 +50,21 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
     address: contractAddress,
     abi: customizableContractAbi,
     functionName: "approveRequestAmount",
+    onSuccess: () => setConfirmationButtonText("Transaction pending"),
+    onError: (e) => {
+      const error = e as UserRejectedRequestError
+      if (error.shortMessage === "User rejected the request.") {
+        setConfirmationButtonText("Approve")
+        toast.error("Transaction canceled")
+      }
+    },
   })
 
   const { status: approvedStatus } = useWaitForTransaction({
     hash: approveResult?.hash,
     confirmations: 1,
     onSuccess(txReceipt) {
+      setConfirmationButtonText("Approve")
       updateApprovals(contractAddress, accountAddress as string)
       refetchContractBalance()
       refetchTotalReleasedAmount()
@@ -66,6 +79,7 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
   })
 
   const approveRequest = () => {
+    setConfirmationButtonText("Waiting for confirmation")
     writeApprove?.({ args: [parseEther(amountForm.getValues("amount"))] })
   }
 
@@ -88,7 +102,7 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
               contractBalance === "0"
             }
           >
-            Approve
+            {confirmationButtonText}
           </Button>
         }
       >
@@ -96,6 +110,7 @@ const Approve = ({ contractAddress, beneficiary }: ApproveProps) => {
           amountForm={amountForm}
           loading={approvedStatus === "loading"}
           confirmAction={approveRequest}
+          buttonLabel={confirmationButtonText}
           cancelAction={() => handleModalState(amountForm, open, setOpen)}
           maxAmountButton={true}
           maxAmount={requestAmount}

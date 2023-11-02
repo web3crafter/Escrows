@@ -5,12 +5,6 @@ import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
 interface ModeToggleProps {

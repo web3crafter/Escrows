@@ -71,7 +71,7 @@ const ConfirmAddressField: React.FC<ConfirmAddressFieldProps> = ({
                   loading={loading}
                   disabled={loading}
                 >
-                  Confirm
+                  {buttonLabel}
                 </SpinnerButton>
               </div>
               <FormMessage />

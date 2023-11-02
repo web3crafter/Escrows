@@ -10,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import Web3Button from "@/components/web-3-button"
 import { standardContractAbi } from "@/constants/abi/abis"
 import { amountSchema } from "@/form-schema/schema"
 import { useContractBalance } from "@/hooks/useContractBalance"
@@ -33,7 +32,6 @@ interface DepositProps {
 const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
   const { isDeployer } = useStandardAccountRoles(contractAddress)
   const { amountForm } = useValidatedForms()
-  const [txValue, setTXValue] = useState<bigint>(BigInt(0))
   const [confirmationButtonText, setConfirmationButtonText] =
     useState<ConfirmationButtonText>("Deposit")
   const { refetch: refetchContractBalance } =
@@ -59,6 +57,7 @@ const Deposit = ({ contractAddress, refetchIsApproved }: DepositProps) => {
     confirmations: 1,
     onSuccess(data) {
       toast.success(`${amountForm.getValues("amount")} Deposited`)
+      setConfirmationButtonText("Deposit")
       refetchIsApproved()
       refetchReleasedAmount()
       refetchContractBalance()

@@ -36,6 +36,7 @@ const CustomizableContractPage = async ({
     const deposits = contractInfoFromDB.deposits
     const approvals = contractInfoFromDB.approvals
 
+    //TODO: Add dynamic button text
     return (
       <main className="container flex flex-col items-center justify-center gap-5">
         <PageHeading contractAddress={contractAddress} />

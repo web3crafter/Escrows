@@ -15,7 +15,7 @@ import { z } from "zod"
 
 interface ConfirmAmountFieldProps {
   loading: boolean
-  buttonLabel?: string
+  buttonLabel: string
   label?: string
   maxAmountButton?: boolean
   maxAmount?: bigint
@@ -86,7 +86,7 @@ const ConfirmAmountField: React.FC<ConfirmAmountFieldProps> = ({
                   loading={loading}
                   disabled={loading}
                 >
-                  Confirm
+                  {buttonLabel}
                 </SpinnerButton>
               </div>
               <FormMessage />

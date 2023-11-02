@@ -1,7 +1,7 @@
 "use client"
 
 import { z } from "zod"
-import { parseEther } from "viem"
+import { UserRejectedRequestError, parseEther } from "viem"
 
 import { useAccount, useContractWrite, useWaitForTransaction } from "wagmi"
 
@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button"
 import { useCustomizableAccountRoles } from "@/hooks/useCustomizableAccountRoles"
 import { handleModalState } from "@/lib/utils"
 import { useValidatedForms } from "@/hooks/useValidatedForms"
+import { ConfirmationButtonText } from "@/types/types"
+import { toast } from "sonner"
 
 interface DepositProps {
   contractAddress: `0x${string}`
@@ -25,15 +27,26 @@ interface DepositProps {
 const Deposit = ({ contractAddress }: DepositProps) => {
   const [open, setOpen] = useState(false)
   const { address: accountAddress } = useAccount()
+  const [confirmationButtonText, setConfirmationButtonText] =
+    useState<ConfirmationButtonText>("Deposit")
   const { isArbiter, isBeneficiary, isDeployer, isManager } =
     useCustomizableAccountRoles(contractAddress)
   const { refetch: refetchContractBalance } =
     useContractBalance(contractAddress)
   const { amountForm } = useValidatedForms()
+
   const { data: depositResult, write: writeDeposit } = useContractWrite({
     address: contractAddress,
     abi: customizableContractAbi,
     functionName: "deposit",
+    onSuccess: () => setConfirmationButtonText("Transaction pending"),
+    onError: (e) => {
+      const error = e as UserRejectedRequestError
+      if (error.shortMessage === "User rejected the request.") {
+        setConfirmationButtonText("Deposit")
+        toast.error("Transaction canceled")
+      }
+    },
   })
 
   const { status: depositedStatus, error: depositedError } =
@@ -41,17 +54,20 @@ const Deposit = ({ contractAddress }: DepositProps) => {
       hash: depositResult?.hash,
       confirmations: 1,
       onSuccess(data) {
+        toast.success(`${amountForm.getValues("amount")} Deposited`)
+        setConfirmationButtonText("Deposit")
         updateDeposits(contractAddress, accountAddress as string)
         refetchContractBalance()
         if (open) {
           handleModalState(amountForm, open, setOpen)
         }
         revalidatePagePath(`/contract/customizable/${contractAddress}`)
-        console.log("Deposit Success")
+        amountForm.reset()
       },
     })
 
   const deposit = (value: z.infer<typeof amountSchema>) => {
+    setConfirmationButtonText("Waiting for confirmation")
     writeDeposit?.({
       value: parseEther(value.amount),
     })
@@ -73,13 +89,14 @@ const Deposit = ({ contractAddress }: DepositProps) => {
                 : "outline"
             }
           >
-            Deposit
+            {confirmationButtonText}
           </Button>
         }
       >
         <ConfirmAmountField
           amountForm={amountForm}
           confirmAction={deposit}
+          buttonLabel={confirmationButtonText}
           cancelAction={() => handleModalState(amountForm, open, setOpen)}
           loading={depositedStatus === "loading"}
         />

@@ -2,6 +2,7 @@
 
 import { SpinnerButton } from "@/components/spinner-button"
 import { Button } from "@/components/ui/button"
+import { ConfirmationButtonText } from "@/types/types"
 
 interface ConfirmMessageAndButtonsProps {
   address: string
@@ -10,6 +11,7 @@ interface ConfirmMessageAndButtonsProps {
   confirmAction: () => void
   disabled: boolean
   loading: boolean
+  confirmButtonLabel: string
 }
 
 const ConfirmMessageAndButtons = ({
@@ -19,6 +21,7 @@ const ConfirmMessageAndButtons = ({
   disabled,
   loading,
   role,
+  confirmButtonLabel,
 }: ConfirmMessageAndButtonsProps) => {
   return (
     <>
@@ -48,7 +51,7 @@ const ConfirmMessageAndButtons = ({
           className="text-primary-foreground"
           onClick={confirmAction}
         >
-          Confirm
+          {confirmButtonLabel}
         </SpinnerButton>
       </div>
     </>

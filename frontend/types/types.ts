@@ -64,3 +64,5 @@ export type ConfirmationButtonText =
   | "Deploy"
   | "Approve"
   | "Deposit"
+  | "Request"
+  | "confirm"
