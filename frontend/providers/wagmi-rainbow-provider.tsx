@@ -1,12 +1,11 @@
 "use client"
+
 import "@rainbow-me/rainbowkit/styles.css"
 import {
-  connectorsForWallets,
   darkTheme,
   getDefaultWallets,
   lightTheme,
   RainbowKitProvider,
-  Theme,
 } from "@rainbow-me/rainbowkit"
 import { configureChains, createConfig, WagmiConfig } from "wagmi"
 import { sepolia, hardhat } from "wagmi/chains"
